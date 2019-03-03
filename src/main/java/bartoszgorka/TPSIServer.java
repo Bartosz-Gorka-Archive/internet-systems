@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -32,6 +33,7 @@ public class TPSIServer {
         server.createContext("/echo", new EchoHandler());
         server.createContext("/redirect", new RedirectHandler());
         server.createContext("/cookies", new CookiesHandler());
+        server.createContext("/auth", new BasicAuthenticationHandler());
 
         // Show info and start server
         System.out.println("Starting server on port: " + port);
@@ -151,6 +153,54 @@ public class TPSIServer {
             exchange.sendResponseHeaders(200, cookieValue.getBytes().length);
             OutputStream os = exchange.getResponseBody();
             os.write(cookieValue.getBytes());
+            os.close();
+        }
+    }
+
+    /**
+     * 6D - Basic Authentication
+     */
+    static class BasicAuthenticationHandler implements HttpHandler {
+        public void handle(HttpExchange exchange) throws IOException {
+            int code = 401;
+            String message = "You should use Basic Authorization";
+
+            // Get header from request
+            String authorization = exchange.getRequestHeaders().getFirst("Authorization");
+
+            // When authorization exist - verify it
+            if (authorization != null) {
+                // Split line - first element should be "Basic" and next encoded credentials
+                String[] parts = authorization.split("\\s");
+                if (parts[0].equals("Basic") && parts.length > 1) {
+                    // Decode input from user
+                    Base64.Decoder decoder = Base64.getDecoder();
+                    String decoded = new String(decoder.decode(parts[1]));
+
+                    // Verify user and password + format
+                    String[] credentials = decoded.split(":");
+                    if (credentials.length == 2) {
+                        // Probably correct user
+                        if (credentials[0].equals("user") && credentials[1].equals("password")) {
+                            // Expected user - say Hello!
+                            code = 200;
+                            message = "Welcome user. Hello!";
+                        } else {
+                            // Another user - block action
+                            code = 403;
+                            message = "Forbidden!";
+                        }
+                    }
+                }
+            }
+
+            // Set content type as plain text
+            exchange.getResponseHeaders().set("Content-Type", "text/plain");
+
+            // Send response
+            exchange.sendResponseHeaders(code, message.getBytes().length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(message.getBytes());
             os.close();
         }
     }
