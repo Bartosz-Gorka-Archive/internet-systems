@@ -31,6 +31,7 @@ public class TPSIServer {
         server.createContext("/", new RootHandlerStaticFile());
         server.createContext("/echo", new EchoHandler());
         server.createContext("/redirect", new RedirectHandler());
+        server.createContext("/cookies", new CookiesHandler());
 
         // Show info and start server
         System.out.println("Starting server on port: " + port);
@@ -121,10 +122,35 @@ public class TPSIServer {
             exchange.getResponseHeaders().set("Location", "/");
 
             // Send response headers - status code
+            // IMPORTANT! Some data (even empty) in response is required to prevent freeze on POST method
             byte[] response = {};
             exchange.sendResponseHeaders(REDIRECT_CODE, response.length);
             OutputStream os = exchange.getResponseBody();
             os.write(response);
+            os.close();
+        }
+    }
+
+    /**
+     * 6C - Cookies
+     * Send in response pseudo-random generated cookie
+     */
+    static class CookiesHandler implements HttpHandler {
+        public void handle(HttpExchange exchange) throws IOException {
+            // Random generated value in Cookie
+            int value = (int) (Math.random() * 1_000_000 + 1);
+            String cookieValue = Integer.toString(value);
+
+            // Set content type as plain text
+            exchange.getResponseHeaders().set("Content-Type", "text/plain");
+
+            // Set cookies
+            exchange.getResponseHeaders().set("Set-Cookie", "CID=" + cookieValue);
+
+            // Send response headers - status code
+            exchange.sendResponseHeaders(200, cookieValue.getBytes().length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(cookieValue.getBytes());
             os.close();
         }
     }
