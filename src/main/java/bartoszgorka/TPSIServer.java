@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class TPSIServer {
     /**
@@ -29,6 +30,7 @@ public class TPSIServer {
         // Contexts - paths
         server.createContext("/", new RootHandlerStaticFile());
         server.createContext("/echo", new EchoHandler());
+        server.createContext("/redirect", new RedirectHandler());
 
         // Show info and start server
         System.out.println("Starting server on port: " + port);
@@ -93,6 +95,36 @@ public class TPSIServer {
             // "Write" - send response to client
             OutputStream os = exchange.getResponseBody();
             os.write(jsonResponse);
+            os.close();
+        }
+    }
+
+    /**
+     * 6B - Redirect to index
+     * Codes:
+     * 301 - Moved permanently - use disk cache (only first request sent)
+     * 302 - Temporary - request sent but used `Location` redirect
+     * 303 - See other
+     */
+    static class RedirectHandler implements HttpHandler {
+        public void handle(HttpExchange exchange) throws IOException {
+            int REDIRECT_CODE = 302;
+
+            // Log request
+            Logger logger = Logger.getLogger("RedirectLogger");
+            logger.info(exchange.getRequestMethod() + " " + exchange.getRequestURI().toString());
+
+            // Set content type as JSON
+            exchange.getResponseHeaders().set("Content-Type", "application/json");
+
+            // Set redirect URL
+            exchange.getResponseHeaders().set("Location", "/");
+
+            // Send response headers - status code
+            byte[] response = {};
+            exchange.sendResponseHeaders(REDIRECT_CODE, response.length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(response);
             os.close();
         }
     }

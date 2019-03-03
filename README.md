@@ -4,3 +4,4 @@ PUT Poznań 2019 - ITI
 
 ## Exercises
 * [Exercise A1](/exercises/http_basic.pdf)
+* [Exercise A2](/exercises/http_basic.pdf)
