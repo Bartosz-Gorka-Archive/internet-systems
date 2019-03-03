@@ -1,10 +1,7 @@
 package bartoszgorka;
 
 import com.cedarsoftware.util.io.JsonWriter;
-import com.sun.net.httpserver.Headers;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -34,6 +31,13 @@ public class TPSIServer {
         server.createContext("/redirect", new RedirectHandler());
         server.createContext("/cookies", new CookiesHandler());
         server.createContext("/auth", new BasicAuthenticationHandler());
+        HttpContext context = server.createContext("/auth2", new BasicAuthenticationClassHandler());
+        context.setAuthenticator(new BasicAuthenticator("auth2") {
+            @Override
+            public boolean checkCredentials(String user, String password) {
+                return user.equals("user") && password.equals("password");
+            }
+        });
 
         // Show info and start server
         System.out.println("Starting server on port: " + port);
@@ -199,6 +203,24 @@ public class TPSIServer {
 
             // Send response
             exchange.sendResponseHeaders(code, message.getBytes().length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(message.getBytes());
+            os.close();
+        }
+    }
+
+    /**
+     * 6E - Basic Authentication with BasicAuthenticator class and setAuthenticator in context
+     */
+    static class BasicAuthenticationClassHandler implements HttpHandler {
+        public void handle(HttpExchange exchange) throws IOException {
+            String message = "Welcome my user!";
+
+            // Set content type as plain text
+            exchange.getResponseHeaders().set("Content-Type", "text/plain");
+
+            // Send response
+            exchange.sendResponseHeaders(200, message.getBytes().length);
             OutputStream os = exchange.getResponseBody();
             os.write(message.getBytes());
             os.close();
