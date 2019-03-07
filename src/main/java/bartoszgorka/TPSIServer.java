@@ -29,7 +29,7 @@ public class TPSIServer {
         server.createContext("/", new RootHandlerStaticFile());
         server.createContext("/echo", new EchoHandler());
         server.createContext("/redirect", new RedirectHandler());
-        server.createContext("/cookies", new CookiesHandler());
+        server.createContext("/cookies/", new CookiesHandler());
         server.createContext("/auth", new BasicAuthenticationHandler());
         HttpContext context = server.createContext("/auth2", new BasicAuthenticationClassHandler());
         context.setAuthenticator(new BasicAuthenticator("auth2") {
@@ -140,6 +140,8 @@ public class TPSIServer {
     /**
      * 6C - Cookies
      * Send in response pseudo-random generated cookie
+     * When domain not match - value not changed, cookie ignored
+     * Path is required when you have /url/ - this / at the end - without `path` cookie will be used only on /url/sub-resource, not / or /echo
      */
     static class CookiesHandler implements HttpHandler {
         public void handle(HttpExchange exchange) throws IOException {
@@ -151,7 +153,7 @@ public class TPSIServer {
             exchange.getResponseHeaders().set("Content-Type", "text/plain");
 
             // Set cookies
-            exchange.getResponseHeaders().set("Set-Cookie", "CID=" + cookieValue);
+            exchange.getResponseHeaders().set("Set-Cookie", "CID=" + cookieValue + "; Domain=localhost;" + "Path=/");
 
             // Send response headers - status code
             exchange.sendResponseHeaders(200, cookieValue.getBytes().length);
