@@ -27,8 +27,8 @@ public class TPSIServer {
 
         // Contexts - paths
         server.createContext("/", new RootHandlerStaticFile());
-        server.createContext("/echo", new EchoHandler());
-        server.createContext("/redirect", new RedirectHandler());
+        server.createContext("/echo/", new EchoHandler());
+        server.createContext("/redirect/", new RedirectHandler());
         server.createContext("/cookies/", new CookiesHandler());
         server.createContext("/auth", new BasicAuthenticationHandler());
         HttpContext context = server.createContext("/auth2", new BasicAuthenticationClassHandler());
@@ -109,31 +109,28 @@ public class TPSIServer {
     /**
      * 6B - Redirect to index
      * Codes:
-     * 301 - Moved permanently - use disk cache (only first request sent)
-     * 302 - Temporary - request sent but used `Location` redirect
-     * 303 - See other
+     * 301 - Moved permanently - use disk cache (only first request sent) - GET / POST may change
+     * 302 - Temporary - request sent but used `Location` redirect, always request Client -> Server - GET / POST may change
+     * 303 - See other - always GET
+     * 307 - Temporary redirect, if POST in first, use POST also in second request
+     * 308 - Permanent redirect, if POST in first, use POST also in second request
      */
     static class RedirectHandler implements HttpHandler {
         public void handle(HttpExchange exchange) throws IOException {
-            int REDIRECT_CODE = 302;
+            // Get response code from request URI
+            // EMPTY / redirect / CODE - Expected code == index 2
+            int REDIRECT_CODE = Integer.parseInt(exchange.getRequestURI().toString().split("/")[2]);
 
             // Log request
             Logger logger = Logger.getLogger("RedirectLogger");
             logger.info(exchange.getRequestMethod() + " " + exchange.getRequestURI().toString());
 
-            // Set content type as JSON
-            exchange.getResponseHeaders().set("Content-Type", "application/json");
-
             // Set redirect URL
             exchange.getResponseHeaders().set("Location", "/");
 
             // Send response headers - status code
-            // IMPORTANT! Some data (even empty) in response is required to prevent freeze on POST method
-            byte[] response = {};
-            exchange.sendResponseHeaders(REDIRECT_CODE, response.length);
-            OutputStream os = exchange.getResponseBody();
-            os.write(response);
-            os.close();
+            // Length 0 when chunked, -1 when no data sent
+            exchange.sendResponseHeaders(REDIRECT_CODE, -1);
         }
     }
 
