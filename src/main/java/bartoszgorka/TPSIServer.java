@@ -188,10 +188,6 @@ public class TPSIServer {
                             // Expected user - say Hello!
                             code = 200;
                             message = "Welcome user. Hello!";
-                        } else {
-                            // Another user - block action
-                            code = 403;
-                            message = "Forbidden!";
                         }
                     }
                 }
@@ -199,6 +195,7 @@ public class TPSIServer {
 
             // Set content type as plain text
             exchange.getResponseHeaders().set("Content-Type", "text/plain");
+            exchange.getResponseHeaders().set("WWW-Authenticate", "Basic realm=MyDomain");
 
             // Send response
             exchange.sendResponseHeaders(code, message.getBytes().length);
