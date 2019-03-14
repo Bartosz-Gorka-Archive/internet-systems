@@ -39,6 +39,12 @@ public class ResourceServer {
         server.start();
     }
 
+    /**
+     * Get content from file or directory.
+     *
+     * @param path Path from user
+     * @return Content as Resource structure
+     */
     private static Resource getContent(String path) {
         StringBuilder builder = new StringBuilder(htmlHeader());
 
@@ -49,7 +55,6 @@ public class ResourceServer {
         boolean correctPath = false;
         try {
             String canonical = file.getCanonicalPath();
-            System.out.println(canonical);
             correctPath = canonical.startsWith(filePath);
         } catch (IOException ignored) {
         }
@@ -91,7 +96,6 @@ public class ResourceServer {
         } else if (file.isFile() && file.canRead()) {
             try {
                 FileInputStream stream = new FileInputStream(file.getAbsolutePath());
-                // TODO read files as binary content
                 return new Resource(200, IOUtils.readFully(stream, -1, false), mimeType);
             } catch (Exception ignored) {
             }
@@ -100,6 +104,9 @@ public class ResourceServer {
         return new Resource(404, "Not found".getBytes(), mimeType);
     }
 
+    /**
+     * @return HTML Header with opened body tag
+     */
     private static String htmlHeader() {
         return "<!DOCTYPE html>\n" +
                 "<html>\n" +
@@ -110,6 +117,9 @@ public class ResourceServer {
                 "<body>";
     }
 
+    /**
+     * @return HTML footer - closing body and html tags
+     */
     private static String htmlFooter() {
         return "</body>\n" +
                 "</html>";
@@ -126,7 +136,6 @@ public class ResourceServer {
 
             // When found mime type (not null) - return it
             if (resource.getMimeType() != null) {
-                System.out.println(resource.getMimeType());
                 exchange.getResponseHeaders().set("Content-Type", resource.getMimeType());
             }
 
