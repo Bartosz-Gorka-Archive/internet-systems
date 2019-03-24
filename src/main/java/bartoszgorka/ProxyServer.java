@@ -57,12 +57,6 @@ public class ProxyServer {
                 for (Map.Entry<String, List<String>> header : exchange.getRequestHeaders().entrySet()) {
                     connection.addRequestProperty(header.getKey(), String.join(", ", header.getValue()));
                 }
-                System.out.println(connection.getURL());
-
-                for (Map.Entry<String, List<String>> header : connection.getRequestProperties().entrySet()) {
-                    System.out.println(header.getKey());
-                    System.out.println(header.getValue());
-                }
 
                 // Add body from origin request
                 String method = exchange.getRequestMethod().toLowerCase();
