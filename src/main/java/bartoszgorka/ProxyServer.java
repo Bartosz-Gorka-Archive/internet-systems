@@ -1,24 +1,31 @@
 package bartoszgorka;
 
+import com.opencsv.CSVReader;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import sun.misc.IOUtils;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class ProxyServer {
+    /**
+     * Black List path
+     * This should be raw text file with one blocked domain in line
+     */
     private final static String filtersFilePath = "black_list.txt";
+    /**
+     * Statistics collection
+     */
+    private static HashSet<Statistic> statistics = new HashSet<>();
 
     /**
      * @param args Arguments from user
@@ -33,13 +40,54 @@ public class ProxyServer {
 
         // Read file
         ArrayList<String> blackList = readFilters();
+        setStatistics();
 
         // Contexts - paths
         server.createContext("/", new ProxyServer.RootHandlerContent(blackList));
 
+        // Add hook - catch terminating to enable store already collected statistics
+        Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+
         // Show info and start server
         System.out.println("Starting server on port: " + port);
         server.start();
+    }
+
+    /**
+     * Read already collected statistics from file
+     * Prevent override statistics
+     */
+    private static void setStatistics() {
+        File file = new File("statistics.csv");
+        try {
+            FileReader fileReader = new FileReader(file);
+            CSVReader reader = new CSVReader(fileReader);
+            String[] nextRecord;
+            // Skip header
+            reader.readNext();
+
+            while ((nextRecord = reader.readNext()) != null) {
+                addStatistics(new Statistic(nextRecord[0], Integer.parseInt(nextRecord[2]), Integer.parseInt(nextRecord[3]), Integer.parseInt(nextRecord[1])));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * @return Statistics collection
+     */
+    public static HashSet<Statistic> getStatistics() {
+        return statistics;
+    }
+
+    /**
+     * Add single statistic record to collection
+     *
+     * @param statistics Request / Response statistic
+     */
+    public static void addStatistics(Statistic statistics) {
+        ProxyServer.statistics.add(statistics);
     }
 
     /**
@@ -99,14 +147,19 @@ public class ProxyServer {
                     connection.addRequestProperty(header.getKey(), String.join(", ", header.getValue()));
                 }
 
+                int transferedBytes = 0;
                 // Add body from origin request
                 String method = exchange.getRequestMethod().toLowerCase();
                 if (method.equals("post") || method.equals("put") || method.equals("patch")) {
                     connection.setDoOutput(true);
                     OutputStream outputStream = connection.getOutputStream();
                     byte[] bytes = IOUtils.readFully(exchange.getRequestBody(), -1, false);
+                    transferedBytes = bytes.length;
                     outputStream.write(bytes);
                 }
+
+                // Add statistics
+                addStatistics(new Statistic(url.getAuthority(), transferedBytes, 0, 1));
 
                 // Make request and build response
                 int code = connection.getResponseCode();
@@ -118,6 +171,9 @@ public class ProxyServer {
                         response = IOUtils.readFully(connection.getErrorStream(), -1, false);
                     }
                 }
+
+                // Add statistics
+                addStatistics(new Statistic(url.getAuthority(), 0, response.length, 1));
 
                 // Add headers
                 for (Map.Entry<String, List<String>> header : connection.getHeaderFields().entrySet()) {
