@@ -5,16 +5,21 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import sun.misc.IOUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.logging.Logger;
 
 public class ProxyServer {
+    private final static String filtersFilePath = "black_list.txt";
+
     /**
      * @param args Arguments from user
      * @throws Exception Potential error - we will see stacktrace
@@ -26,8 +31,11 @@ public class ProxyServer {
         // Server will use all possible IP addresses
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 
+        // Read file
+        ArrayList<String> blackList = readFilters();
+
         // Contexts - paths
-        server.createContext("/", new ProxyServer.RootHandlerContent());
+        server.createContext("/", new ProxyServer.RootHandlerContent(blackList));
 
         // Show info and start server
         System.out.println("Starting server on port: " + port);
@@ -35,9 +43,33 @@ public class ProxyServer {
     }
 
     /**
+     * Read file with rules
+     *
+     * @return Black list of domains
+     * @throws Exception When not found file - throw error
+     */
+    private static ArrayList<String> readFilters() throws Exception {
+        ArrayList<String> response = new ArrayList<>();
+
+        // Read file line by line
+        Scanner scanner = new Scanner(new File(filtersFilePath));
+        while (scanner.hasNext()) {
+            response.add(scanner.nextLine().toLowerCase());
+        }
+
+        return response;
+    }
+
+    /**
      * Root handler
      */
     static class RootHandlerContent implements HttpHandler {
+        private static ArrayList<String> blackList;
+
+        public RootHandlerContent(ArrayList<String> list) {
+            blackList = (ArrayList<String>) list.clone();
+        }
+
         public void handle(HttpExchange exchange) throws IOException {
             try {
                 // We can log each request to Proxy
@@ -46,6 +78,15 @@ public class ProxyServer {
 
                 // Build connection between Proxy and Server
                 URL url = exchange.getRequestURI().toURL();
+
+                // Check URL not blocked
+                for (String s : blackList) {
+                    if ((url.getAuthority() + url.getPath()).toLowerCase().contains(s)) {
+                        throw new BlockedURLException();
+                    }
+                }
+
+                // Open connection
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
                 // Disable follow redirects
@@ -91,6 +132,13 @@ public class ProxyServer {
                 if (response.length > 0) {
                     os.write(response);
                 }
+                os.close();
+            } catch (BlockedURLException e) {
+                // Send 403 - Forbidden
+                byte[] response = "No way!".getBytes();
+                exchange.sendResponseHeaders(403, response.length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(response);
                 os.close();
             } catch (Exception e) {
                 e.printStackTrace();
