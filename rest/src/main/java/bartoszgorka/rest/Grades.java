@@ -18,15 +18,11 @@ public class Grades {
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response registerNewGrade(@PathParam("index") int index, Grade rawGradeBody, @Context UriInfo uriInfo) {
+    public Response registerNewGrade(@PathParam("index") int index, Grade rawGradeBody, @Context UriInfo uriInfo) throws NotFoundException, BadRequestException {
         Grade newGrade = DB.registerNewGrade(index, rawGradeBody);
 
-        if (newGrade != null) {
-            UriBuilder builder = uriInfo.getAbsolutePathBuilder();
-            builder.path(Integer.toString(newGrade.getID()));
-            return Response.created(builder.build()).entity(newGrade).build();
-        }
-
-        return Response.status(Response.Status.BAD_REQUEST).build();
+        UriBuilder builder = uriInfo.getAbsolutePathBuilder();
+        builder.path(Integer.toString(newGrade.getID()));
+        return Response.created(builder.build()).entity(newGrade).build();
     }
 }

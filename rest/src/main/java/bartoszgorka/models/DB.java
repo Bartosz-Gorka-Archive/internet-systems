@@ -1,5 +1,7 @@
 package bartoszgorka.models;
 
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.NotFoundException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,7 +64,7 @@ public class DB {
         return courses;
     }
 
-    public static Student addNewStudent(Student rawStudent) {
+    public static Student addNewStudent(Student rawStudent) throws BadRequestException {
         if (rawStudent.getFirstName() != null && rawStudent.getLastName() != null && rawStudent.getDateOfBirth() != null) {
             Student student = new Student();
             lastStudentIndex++;
@@ -76,10 +78,10 @@ public class DB {
             return student;
         }
 
-        return null;
+        throw new BadRequestException();
     }
 
-    public static Course registerNewCourse(Course rawCourse) {
+    public static Course registerNewCourse(Course rawCourse) throws BadRequestException {
         if (rawCourse.getName() != null && rawCourse.getSupervisor() != null) {
             Course course = new Course();
             lastCourseID++;
@@ -91,10 +93,10 @@ public class DB {
             return course;
         }
 
-        return null;
+        throw new BadRequestException();
     }
 
-    public static Course updateCourse(int courseID, Course rawCourseBody) {
+    public static Course updateCourse(int courseID, Course rawCourseBody) throws NotFoundException {
         DB.getInstance();
         Optional<Course> possibleCourse = courses.stream().filter(course -> course.getID() == courseID).findFirst();
         if (possibleCourse.isPresent()) {
@@ -109,10 +111,10 @@ public class DB {
             return course;
         }
 
-        return null;
+        throw new NotFoundException();
     }
 
-    public static boolean removeCourse(int courseID) {
+    public static void removeCourse(int courseID) throws NotFoundException {
         DB.getInstance();
         Course c = courses.stream().filter(course -> course.getID() == courseID).findFirst().orElse(null);
         if (c != null) {
@@ -125,14 +127,12 @@ public class DB {
                     }
                 }
             }
-
-            return true;
+        } else {
+            throw new NotFoundException();
         }
-
-        return false;
     }
 
-    public static Student updateStudent(int index, Student rawStudentBody) {
+    public static Student updateStudent(int index, Student rawStudentBody) throws NotFoundException {
         DB.getInstance();
         Optional<Student> possibleStudent = students.stream().filter(student -> student.getIndex() == index).findFirst();
         if (possibleStudent.isPresent()) {
@@ -150,26 +150,30 @@ public class DB {
             return student;
         }
 
-        return null;
+        throw new NotFoundException();
     }
 
-    public static boolean removeStudent(int index) {
+    public static void removeStudent(int index) throws NotFoundException {
         DB.getInstance();
         Student s = students.stream().filter(student -> student.getIndex() == index).findFirst().orElse(null);
         if (s != null) {
             students.remove(s);
-            return true;
+        } else {
+            throw new NotFoundException();
+        }
+    }
+
+    public static Set<Grade> getGrades(int index) throws NotFoundException {
+        DB.getInstance();
+        Set<Grade> grades = students.stream().filter(student -> student.getIndex() == index).findFirst().map(Student::getGrades).orElse(null);
+        if (grades != null) {
+            return grades;
         }
 
-        return false;
+        throw new NotFoundException();
     }
 
-    public static Set<Grade> getGrades(int index) {
-        DB.getInstance();
-        return students.stream().filter(student -> student.getIndex() == index).findFirst().map(Student::getGrades).orElse(null);
-    }
-
-    public static Grade registerNewGrade(int index, Grade rawGradeBody) {
+    public static Grade registerNewGrade(int index, Grade rawGradeBody) throws NotFoundException, BadRequestException {
         List<Integer> courseIDs = courses.stream().map(Course::getID).collect(Collectors.toList());
         if (courseIDs.contains(rawGradeBody.getCourseID()) && rawGradeBody.getCreatedAt() != null && rawGradeBody.getGrade() != null) {
             DB.getInstance();
@@ -184,13 +188,15 @@ public class DB {
 
                 student.getGrades().add(grade);
                 return grade;
+            } else {
+                throw new NotFoundException();
             }
         }
 
-        return null;
+        throw new BadRequestException();
     }
 
-    public static Grade updateGrade(int index, int gradeID, Grade rawGradeBody) {
+    public static Grade updateGrade(int index, int gradeID, Grade rawGradeBody) throws NotFoundException {
         DB.getInstance();
         Grade grade = getGrades(index).stream().filter(g -> g.getID() == gradeID).findFirst().orElse(null);
         if (grade != null) {
@@ -210,17 +216,16 @@ public class DB {
             return grade;
         }
 
-        return null;
+        throw new NotFoundException();
     }
 
-    public static boolean removeGrade(int index, int gradeID) {
+    public static void removeGrade(int index, int gradeID) throws NotFoundException {
         DB.getInstance();
         Grade grade = getGrades(index).stream().filter(g -> g.getID() == gradeID).findFirst().orElse(null);
         if (grade != null) {
             getGrades(index).remove(grade);
-            return true;
+        } else {
+            throw new NotFoundException();
         }
-
-        return false;
     }
 }
