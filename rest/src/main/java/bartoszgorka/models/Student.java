@@ -2,7 +2,9 @@ package bartoszgorka.models;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @XmlRootElement
 public class Student {

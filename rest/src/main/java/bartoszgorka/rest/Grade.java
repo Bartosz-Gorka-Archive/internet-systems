@@ -10,6 +10,7 @@ import javax.ws.rs.core.Response;
 public class Grade {
 
     @GET
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getGrade(@PathParam("index") int index, @PathParam("ID") int gradeID) {
         bartoszgorka.models.Grade g = DB.getGrades(index).stream().filter(grade -> grade.getID() == gradeID).findFirst().orElse(null);
         if (g != null) {
@@ -20,7 +21,8 @@ public class Grade {
     }
 
     @PUT
-    @Consumes(MediaType.APPLICATION_XML)
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response updateGrade(@PathParam("index") int index, @PathParam("ID") int gradeID, bartoszgorka.models.Grade rawGradeBody) {
         bartoszgorka.models.Grade g = DB.updateGrade(index, gradeID, rawGradeBody);
         if (g != null) {
@@ -30,6 +32,7 @@ public class Grade {
     }
 
     @DELETE
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response removeGrade(@PathParam("index") int index, @PathParam("ID") int gradeID) {
         boolean success = DB.removeGrade(index, gradeID);
 

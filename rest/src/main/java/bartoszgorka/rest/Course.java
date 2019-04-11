@@ -10,6 +10,7 @@ import javax.ws.rs.core.Response;
 public class Course {
 
     @GET
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCourse(@PathParam("ID") int courseID) {
         bartoszgorka.models.Course c = DB.getCourses().stream().filter(course -> course.getID() == courseID).findFirst().orElse(null);
         if (c != null) {
@@ -20,7 +21,8 @@ public class Course {
     }
 
     @PUT
-    @Consumes(MediaType.APPLICATION_XML)
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response updateCourse(@PathParam("ID") int courseID, bartoszgorka.models.Course rawCourseBody) {
         bartoszgorka.models.Course course = DB.updateCourse(courseID, rawCourseBody);
         if (course != null) {
@@ -30,6 +32,7 @@ public class Course {
     }
 
     @DELETE
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response removeCourse(@PathParam("ID") int courseID) {
         boolean success = DB.removeCourse(courseID);
 
