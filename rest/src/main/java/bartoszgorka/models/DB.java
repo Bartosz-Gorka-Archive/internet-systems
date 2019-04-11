@@ -112,16 +112,24 @@ public class DB {
         return null;
     }
 
-    public static void removeCourse(int courseID) {
+    public static boolean removeCourse(int courseID) {
         DB.getInstance();
-        courses.stream().filter(course -> course.getID() == courseID).findFirst().ifPresent(course -> courses.remove(course));
-        for(Student s : students) {
-            for (Grade grade : s.getGrades()) {
-                if (grade.getCourseID() == courseID) {
-                    s.getGrades().remove(grade);
+        Course c = courses.stream().filter(course -> course.getID() == courseID).findFirst().orElse(null);
+        if (c != null) {
+            courses.remove(c);
+
+            for (Student s : students) {
+                for (Grade grade : s.getGrades()) {
+                    if (grade.getCourseID() == courseID) {
+                        s.getGrades().remove(grade);
+                    }
                 }
             }
+
+            return true;
         }
+
+        return false;
     }
 
     public static Student updateStudent(int index, Student rawStudentBody) {
@@ -145,9 +153,15 @@ public class DB {
         return null;
     }
 
-    public static void removeStudent(int index) {
+    public static boolean removeStudent(int index) {
         DB.getInstance();
-        students.stream().filter(student -> student.getIndex() == index).findFirst().ifPresent(student -> students.remove(student));
+        Student s = students.stream().filter(student -> student.getIndex() == index).findFirst().orElse(null);
+        if (s != null) {
+            students.remove(s);
+            return true;
+        }
+
+        return false;
     }
 
     public static Set<Grade> getGrades(int index) {
@@ -199,8 +213,14 @@ public class DB {
         return null;
     }
 
-    public static void removeGrade(int index, int gradeID) {
+    public static boolean removeGrade(int index, int gradeID) {
         DB.getInstance();
-        getGrades(index).stream().filter(g -> g.getID() == gradeID).findFirst().ifPresent(g -> getGrades(index).remove(g));
+        Grade grade = getGrades(index).stream().filter(g -> g.getID() == gradeID).findFirst().orElse(null);
+        if (grade != null) {
+            getGrades(index).remove(grade);
+            return true;
+        }
+
+        return false;
     }
 }

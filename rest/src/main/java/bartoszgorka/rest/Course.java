@@ -31,7 +31,12 @@ public class Course {
 
     @DELETE
     public Response removeCourse(@PathParam("ID") int courseID) {
-        DB.removeCourse(courseID);
-        return Response.noContent().build();
+        boolean success = DB.removeCourse(courseID);
+
+        if (success) {
+            return Response.noContent().build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
     }
 }
