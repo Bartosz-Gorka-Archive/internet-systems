@@ -11,35 +11,27 @@ public class Course {
 
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getCourse(@PathParam("ID") int courseID) {
+    public Response getCourse(@PathParam("ID") int courseID) throws NotFoundException {
         bartoszgorka.models.Course c = DB.getCourses().stream().filter(course -> course.getID() == courseID).findFirst().orElse(null);
         if (c != null) {
             return Response.ok(c).build();
-        } else {
-            return Response.status(Response.Status.NOT_FOUND).build();
         }
+
+        throw new NotFoundException();
     }
 
     @PUT
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response updateCourse(@PathParam("ID") int courseID, bartoszgorka.models.Course rawCourseBody) {
+    public Response updateCourse(@PathParam("ID") int courseID, bartoszgorka.models.Course rawCourseBody) throws NotFoundException {
         bartoszgorka.models.Course course = DB.updateCourse(courseID, rawCourseBody);
-        if (course != null) {
-            return Response.ok(course).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).build();
+        return Response.ok(course).build();
     }
 
     @DELETE
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response removeCourse(@PathParam("ID") int courseID) {
-        boolean success = DB.removeCourse(courseID);
-
-        if (success) {
-            return Response.noContent().build();
-        } else {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
+    public Response removeCourse(@PathParam("ID") int courseID) throws NotFoundException {
+        DB.removeCourse(courseID);
+        return Response.noContent().build();
     }
 }

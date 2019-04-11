@@ -11,35 +11,27 @@ public class Grade {
 
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getGrade(@PathParam("index") int index, @PathParam("ID") int gradeID) {
+    public Response getGrade(@PathParam("index") int index, @PathParam("ID") int gradeID) throws NotFoundException {
         bartoszgorka.models.Grade g = DB.getGrades(index).stream().filter(grade -> grade.getID() == gradeID).findFirst().orElse(null);
         if (g != null) {
             return Response.ok(g).build();
-        } else {
-            return Response.status(Response.Status.NOT_FOUND).build();
         }
+
+        throw new NotFoundException();
     }
 
     @PUT
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response updateGrade(@PathParam("index") int index, @PathParam("ID") int gradeID, bartoszgorka.models.Grade rawGradeBody) {
+    public Response updateGrade(@PathParam("index") int index, @PathParam("ID") int gradeID, bartoszgorka.models.Grade rawGradeBody) throws NotFoundException {
         bartoszgorka.models.Grade g = DB.updateGrade(index, gradeID, rawGradeBody);
-        if (g != null) {
-            return Response.ok(g).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).build();
+        return Response.ok(g).build();
     }
 
     @DELETE
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response removeGrade(@PathParam("index") int index, @PathParam("ID") int gradeID) {
-        boolean success = DB.removeGrade(index, gradeID);
-
-        if (success) {
-            return Response.noContent().build();
-        } else {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
+    public Response removeGrade(@PathParam("index") int index, @PathParam("ID") int gradeID) throws NotFoundException {
+        DB.removeGrade(index, gradeID);
+        return Response.noContent().build();
     }
 }

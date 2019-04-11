@@ -11,36 +11,28 @@ public class Student {
 
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getStudentByIndex(@PathParam("index") String index) {
+    public Response getStudentByIndex(@PathParam("index") String index) throws NotFoundException {
         int studentIndex = Integer.parseInt(index);
         bartoszgorka.models.Student s = DB.getStudents().stream().filter(student -> student.getIndex() == studentIndex).findFirst().orElse(null);
         if (s != null) {
             return Response.ok(s).build();
-        } else {
-            return Response.status(Response.Status.NOT_FOUND).build();
         }
+
+        throw new NotFoundException();
     }
 
     @PUT
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response updateStudentRecord(@PathParam("index") int index, bartoszgorka.models.Student rawStudentBody) {
+    public Response updateStudentRecord(@PathParam("index") int index, bartoszgorka.models.Student rawStudentBody) throws NotFoundException {
         bartoszgorka.models.Student student = DB.updateStudent(index, rawStudentBody);
-        if (student != null) {
-            return Response.ok(student).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).build();
+        return Response.ok(student).build();
     }
 
     @DELETE
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response removeStudent(@PathParam("index") int index) {
-        boolean success = DB.removeStudent(index);
-
-        if (success) {
-            return Response.noContent().build();
-        } else {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
+    public Response removeStudent(@PathParam("index") int index) throws NotFoundException {
+        DB.removeStudent(index);
+        return Response.noContent().build();
     }
 }

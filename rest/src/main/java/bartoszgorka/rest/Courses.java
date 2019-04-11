@@ -18,15 +18,11 @@ public class Courses {
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response registerNewCourse(Course rawCourseBody, @Context UriInfo uriInfo) {
+    public Response registerNewCourse(Course rawCourseBody, @Context UriInfo uriInfo) throws BadRequestException {
         Course newCourse = DB.registerNewCourse(rawCourseBody);
 
-        if (newCourse != null) {
-            UriBuilder builder = uriInfo.getAbsolutePathBuilder();
-            builder.path(Integer.toString(newCourse.getID()));
-            return Response.created(builder.build()).entity(newCourse).build();
-        }
-
-        return Response.status(Response.Status.BAD_REQUEST).build();
+        UriBuilder builder = uriInfo.getAbsolutePathBuilder();
+        builder.path(Integer.toString(newCourse.getID()));
+        return Response.created(builder.build()).entity(newCourse).build();
     }
 }
