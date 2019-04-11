@@ -32,7 +32,12 @@ public class Student {
 
     @DELETE
     public Response removeStudent(@PathParam("index") int index) {
-        DB.removeStudent(index);
-        return Response.noContent().build();
+        boolean success = DB.removeStudent(index);
+
+        if (success) {
+            return Response.noContent().build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
     }
 }

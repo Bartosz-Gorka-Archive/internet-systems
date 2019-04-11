@@ -31,7 +31,12 @@ public class Grade {
 
     @DELETE
     public Response removeGrade(@PathParam("index") int index, @PathParam("ID") int gradeID) {
-        DB.removeGrade(index, gradeID);
-        return Response.noContent().build();
+        boolean success = DB.removeGrade(index, gradeID);
+
+        if (success) {
+            return Response.noContent().build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
     }
 }
