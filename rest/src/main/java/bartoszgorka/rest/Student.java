@@ -10,6 +10,7 @@ import javax.ws.rs.core.Response;
 public class Student {
 
     @GET
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getStudentByIndex(@PathParam("index") String index) {
         int studentIndex = Integer.parseInt(index);
         bartoszgorka.models.Student s = DB.getStudents().stream().filter(student -> student.getIndex() == studentIndex).findFirst().orElse(null);
@@ -21,7 +22,8 @@ public class Student {
     }
 
     @PUT
-    @Consumes(MediaType.APPLICATION_XML)
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response updateStudentRecord(@PathParam("index") int index, bartoszgorka.models.Student rawStudentBody) {
         bartoszgorka.models.Student student = DB.updateStudent(index, rawStudentBody);
         if (student != null) {
@@ -31,6 +33,7 @@ public class Student {
     }
 
     @DELETE
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response removeStudent(@PathParam("index") int index) {
         boolean success = DB.removeStudent(index);
 

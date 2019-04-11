@@ -10,12 +10,14 @@ import java.util.Set;
 @Path("/students/{index}/grades")
 public class Grades {
     @GET
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Set<Grade> getAllGradesForStudent(@PathParam("index") int index) {
         return DB.getGrades(index);
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_XML)
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response registerNewGrade(@PathParam("index") int index, Grade rawGradeBody, @Context UriInfo uriInfo) {
         Grade newGrade = DB.registerNewGrade(index, rawGradeBody);
 
