@@ -3,6 +3,8 @@ package bartoszgorka.rest;
 import bartoszgorka.models.DB;
 import bartoszgorka.models.Grade;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.Set;
@@ -11,6 +13,7 @@ import java.util.Set;
 public class Grades {
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @PermitAll
     public Set<Grade> getAllGradesForStudent(@PathParam("index") int index) {
         return DB.getGrades(index);
     }
@@ -18,6 +21,7 @@ public class Grades {
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @RolesAllowed({"supervisor", "admin"})
     public Response registerNewGrade(@PathParam("index") int index, Grade rawGradeBody, @Context UriInfo uriInfo) throws NotFoundException, BadRequestException {
         Grade newGrade = DB.registerNewGrade(index, rawGradeBody);
 
