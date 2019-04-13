@@ -3,6 +3,8 @@ package bartoszgorka.rest;
 import bartoszgorka.models.DB;
 import bartoszgorka.models.Student;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.Set;
@@ -11,6 +13,7 @@ import java.util.Set;
 public class Students {
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @PermitAll
     public Set<Student> getAllStudents() {
         return DB.getStudents();
     }
@@ -18,6 +21,7 @@ public class Students {
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @RolesAllowed("admin")
     public Response registerNewStudent(Student rawStudentBody, @Context UriInfo uriInfo) throws BadRequestException {
         Student student = DB.addNewStudent(rawStudentBody);
 
