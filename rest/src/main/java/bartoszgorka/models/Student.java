@@ -1,13 +1,19 @@
 package bartoszgorka.models;
 
+import javax.ws.rs.core.Link;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.util.*;
 
+// TODO - add links in Student (single), Grade (single) and Course (single)
+// TODO - return course structure instead of reference - grades
 @XmlRootElement
 public class Student {
+    @XmlElementWrapper(name = "links")
+    @XmlJavaTypeAdapter(Link.JaxbAdapter.class)
+    private List<Link> links = new ArrayList<>();
     private int index;
     private String firstName;
     private String lastName;
@@ -62,5 +68,9 @@ public class Student {
 
     public void setGrades(Set<Grade> grades) {
         this.grades = grades;
+    }
+
+    public void setLinks(List<Link> links) {
+        this.links = links;
     }
 }
