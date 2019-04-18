@@ -8,7 +8,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.Set;
 
-@Path("/courses")
+@Path("courses")
 public class Courses {
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
