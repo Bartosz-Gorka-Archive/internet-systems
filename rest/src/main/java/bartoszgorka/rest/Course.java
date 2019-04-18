@@ -8,7 +8,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/courses/{ID}")
+@Path("courses/{ID}")
 public class Course {
 
     @GET

@@ -1,6 +1,14 @@
 package bartoszgorka.models;
 
+import bartoszgorka.rest.Course;
+import bartoszgorka.rest.Grades;
+import bartoszgorka.rest.Student;
+import org.glassfish.jersey.linking.Binding;
+import org.glassfish.jersey.linking.InjectLink;
+import org.glassfish.jersey.linking.InjectLinks;
+
 import javax.ws.rs.core.Link;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -10,9 +18,36 @@ import java.util.List;
 
 @XmlRootElement
 public class Grade {
+    @InjectLinks({
+        @InjectLink(
+            style = InjectLink.Style.ABSOLUTE,
+            resource = Grades.class,
+            bindings = {
+                @Binding(name="index", value="${instance.studentIndex}"),
+                @Binding(name="ID", value="${instance.ID}")
+            },
+            rel = "self"),
+        @InjectLink(
+            style = InjectLink.Style.ABSOLUTE,
+            resource = Student.class,
+            bindings = {@Binding(name="index", value="${instance.studentIndex}")},
+            rel = "student"),
+        @InjectLink(
+            style = InjectLink.Style.ABSOLUTE,
+            resource = bartoszgorka.rest.Grade.class,
+            bindings = {@Binding(name="index", value="${instance.studentIndex}")},
+            rel = "parent"),
+        @InjectLink(
+            style = InjectLink.Style.ABSOLUTE,
+            resource = Course.class,
+            bindings = {@Binding(name="ID", value="${instance.courseID}")},
+            rel = "course")
+
+    })
+    @XmlElement(name="link")
     @XmlElementWrapper(name = "links")
     @XmlJavaTypeAdapter(Link.JaxbAdapter.class)
-    private List<Link> links;
+    List<Link> links;
     private int ID;
     @XmlTransient
     private int studentIndex;

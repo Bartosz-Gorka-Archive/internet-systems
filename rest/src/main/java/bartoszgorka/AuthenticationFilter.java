@@ -63,7 +63,7 @@ public class AuthenticationFilter implements javax.ws.rs.container.ContainerRequ
 
                 // Is user valid?
                 if (!isUserAllowed(username, password, rolesSet)) {
-                    requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
+                    requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
                             .entity("You cannot access this resource or action").build());
                 }
             }

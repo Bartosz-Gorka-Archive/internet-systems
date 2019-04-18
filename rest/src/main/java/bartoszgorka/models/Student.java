@@ -1,18 +1,41 @@
 package bartoszgorka.models;
 
+import bartoszgorka.rest.Grades;
+import bartoszgorka.rest.Students;
+import org.glassfish.jersey.linking.Binding;
+import org.glassfish.jersey.linking.InjectLink;
+import org.glassfish.jersey.linking.InjectLinks;
+
 import javax.ws.rs.core.Link;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.*;
 
-// TODO - return course structure instead of reference - grades
 @XmlRootElement
 public class Student {
+    @InjectLinks({
+        @InjectLink(
+            style = InjectLink.Style.ABSOLUTE,
+            resource = bartoszgorka.rest.Student.class,
+            bindings = {@Binding(name="index", value="${instance.index}")},
+            rel = "self"),
+        @InjectLink(
+            style = InjectLink.Style.ABSOLUTE,
+            resource = Students.class,
+            rel = "parent"),
+        @InjectLink(
+            style = InjectLink.Style.ABSOLUTE,
+            resource = Grades.class,
+            bindings = {@Binding(name="index", value="${instance.index}")},
+            rel = "grades")
+    })
+    @XmlElement(name="link")
     @XmlElementWrapper(name = "links")
     @XmlJavaTypeAdapter(Link.JaxbAdapter.class)
-    private List<Link> links = new ArrayList<>();
+    List<Link> links;
     private int index;
     private String firstName;
     private String lastName;

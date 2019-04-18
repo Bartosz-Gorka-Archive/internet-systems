@@ -9,7 +9,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.Set;
 
-@Path("/students")
+@Path("students")
 public class Students {
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
