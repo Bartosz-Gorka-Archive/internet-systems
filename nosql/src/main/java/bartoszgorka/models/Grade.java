@@ -8,9 +8,7 @@ import org.bson.types.ObjectId;
 import org.glassfish.jersey.linking.Binding;
 import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
-import org.mongodb.morphia.annotations.Embedded;
-import org.mongodb.morphia.annotations.Id;
-import org.mongodb.morphia.annotations.Transient;
+import org.mongodb.morphia.annotations.*;
 
 import javax.ws.rs.core.Link;
 import javax.xml.bind.annotation.XmlElement;
@@ -23,6 +21,9 @@ import java.util.List;
 
 @Embedded
 @XmlRootElement
+@Indexes(
+        @Index(fields = {@Field("studentIndex"), @Field("ID")}, options = @IndexOptions(unique = true))
+)
 public class Grade {
     @InjectLinks({
             @InjectLink(
