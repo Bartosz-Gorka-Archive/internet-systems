@@ -2,17 +2,23 @@ package bartoszgorka.models;
 
 import bartoszgorka.rest.CourseREST;
 import bartoszgorka.rest.CoursesREST;
+import org.bson.types.ObjectId;
 import org.glassfish.jersey.linking.Binding;
 import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Transient;
 
 import javax.ws.rs.core.Link;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.List;
 
+@Entity
 @XmlRootElement
 public class Course {
     @InjectLinks({
@@ -29,7 +35,11 @@ public class Course {
     @XmlElement(name = "link")
     @XmlElementWrapper(name = "links")
     @XmlJavaTypeAdapter(Link.JaxbAdapter.class)
+    @Transient
     List<Link> links;
+    @XmlTransient
+    @Id
+    ObjectId _id;
     private int ID;
     private String supervisor;
     private String name;

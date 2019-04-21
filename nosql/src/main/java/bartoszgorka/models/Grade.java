@@ -4,9 +4,13 @@ import bartoszgorka.rest.CourseREST;
 import bartoszgorka.rest.GradeREST;
 import bartoszgorka.rest.GradesREST;
 import bartoszgorka.rest.StudentREST;
+import org.bson.types.ObjectId;
 import org.glassfish.jersey.linking.Binding;
 import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
+import org.mongodb.morphia.annotations.Embedded;
+import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Transient;
 
 import javax.ws.rs.core.Link;
 import javax.xml.bind.annotation.XmlElement;
@@ -17,6 +21,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.Date;
 import java.util.List;
 
+@Embedded
 @XmlRootElement
 public class Grade {
     @InjectLinks({
@@ -47,7 +52,11 @@ public class Grade {
     @XmlElement(name = "link")
     @XmlElementWrapper(name = "links")
     @XmlJavaTypeAdapter(Link.JaxbAdapter.class)
+    @Transient
     List<Link> links;
+    @XmlTransient
+    @Id
+    ObjectId _id;
     private int ID;
     @XmlTransient
     private int studentIndex;
