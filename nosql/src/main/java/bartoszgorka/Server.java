@@ -2,6 +2,7 @@ package bartoszgorka;
 
 import bartoszgorka.rest.*;
 import bartoszgorka.storage.DB;
+import bartoszgorka.storage.StaticDB;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.linking.DeclarativeLinkingFeature;
@@ -13,7 +14,6 @@ import java.net.URI;
 public class Server {
     public static void main(String[] args) {
         URI baseUri = UriBuilder.fromUri("http://localhost/").port(8000).build();
-        DB.getInstance();
         ResourceConfig config = new ResourceConfig(
                 StudentsREST.class,
                 StudentREST.class,
@@ -27,5 +27,9 @@ public class Server {
         );
 
         HttpServer server = GrizzlyHttpServerFactory.createHttpServer(baseUri, config);
+    }
+
+    public static DB getDatabase() {
+        return StaticDB.getInstance();
     }
 }

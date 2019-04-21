@@ -1,6 +1,6 @@
 package bartoszgorka.rest;
 
-import bartoszgorka.storage.DB;
+import bartoszgorka.Server;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -16,7 +16,7 @@ public class StudentREST {
     @PermitAll
     public Response getStudentByIndex(@PathParam("index") String index) throws NotFoundException {
         int studentIndex = Integer.parseInt(index);
-        bartoszgorka.models.Student s = DB.getStudents().stream().filter(student -> student.getIndex() == studentIndex).findFirst().orElse(null);
+        bartoszgorka.models.Student s = Server.getDatabase().getStudents().stream().filter(student -> student.getIndex() == studentIndex).findFirst().orElse(null);
         if (s != null) {
             s.clearLinks();
             return Response.ok(s).build();
@@ -30,7 +30,7 @@ public class StudentREST {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @RolesAllowed("admin")
     public Response updateStudentRecord(@PathParam("index") int index, bartoszgorka.models.Student rawStudentBody) throws NotFoundException {
-        bartoszgorka.models.Student student = DB.updateStudent(index, rawStudentBody);
+        bartoszgorka.models.Student student = Server.getDatabase().updateStudent(index, rawStudentBody);
         student.clearLinks();
         return Response.ok(student).build();
     }
@@ -39,7 +39,7 @@ public class StudentREST {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @RolesAllowed("admin")
     public Response removeStudent(@PathParam("index") int index) throws NotFoundException {
-        DB.removeStudent(index);
+        Server.getDatabase().removeStudent(index);
         return Response.noContent().build();
     }
 }

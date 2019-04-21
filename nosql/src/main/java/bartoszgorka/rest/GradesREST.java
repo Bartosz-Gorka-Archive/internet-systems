@@ -1,7 +1,7 @@
 package bartoszgorka.rest;
 
+import bartoszgorka.Server;
 import bartoszgorka.models.Grade;
-import bartoszgorka.storage.DB;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -15,10 +15,10 @@ public class GradesREST {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @PermitAll
     public Set<Grade> getAllGradesForStudent(@PathParam("index") int index) {
-        for (Grade g : DB.getGrades(index)) {
+        for (Grade g : Server.getDatabase().getGrades(index)) {
             g.clearLinks();
         }
-        return DB.getGrades(index);
+        return Server.getDatabase().getGrades(index);
     }
 
     @POST
@@ -26,7 +26,7 @@ public class GradesREST {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @RolesAllowed({"supervisor", "admin"})
     public Response registerNewGrade(@PathParam("index") int index, Grade rawGradeBody, @Context UriInfo uriInfo) throws NotFoundException, BadRequestException {
-        Grade newGrade = DB.registerNewGrade(index, rawGradeBody);
+        Grade newGrade = Server.getDatabase().registerNewGrade(index, rawGradeBody);
         newGrade.clearLinks();
 
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();

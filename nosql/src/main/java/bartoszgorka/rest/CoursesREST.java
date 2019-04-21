@@ -1,7 +1,7 @@
 package bartoszgorka.rest;
 
+import bartoszgorka.Server;
 import bartoszgorka.models.Course;
-import bartoszgorka.storage.DB;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
@@ -13,10 +13,10 @@ public class CoursesREST {
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Set<Course> getAllCourses() {
-        for (Course c : DB.getCourses()) {
+        for (Course c : Server.getDatabase().getCourses()) {
             c.clearLinks();
         }
-        return DB.getCourses();
+        return Server.getDatabase().getCourses();
     }
 
     @POST
@@ -24,7 +24,7 @@ public class CoursesREST {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @RolesAllowed({"supervisor", "admin"})
     public Response registerNewCourse(Course rawCourseBody, @Context UriInfo uriInfo) throws BadRequestException {
-        Course newCourse = DB.registerNewCourse(rawCourseBody);
+        Course newCourse = Server.getDatabase().registerNewCourse(rawCourseBody);
         newCourse.clearLinks();
 
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();

@@ -1,6 +1,6 @@
 package bartoszgorka.rest;
 
-import bartoszgorka.storage.DB;
+import bartoszgorka.Server;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -15,7 +15,7 @@ public class GradeREST {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @PermitAll
     public Response getGrade(@PathParam("index") int index, @PathParam("ID") int gradeID) throws NotFoundException {
-        bartoszgorka.models.Grade g = DB.getGrades(index).stream().filter(grade -> grade.getID() == gradeID).findFirst().orElse(null);
+        bartoszgorka.models.Grade g = Server.getDatabase().getGrades(index).stream().filter(grade -> grade.getID() == gradeID).findFirst().orElse(null);
         if (g != null) {
             g.clearLinks();
             return Response.ok(g).build();
@@ -29,7 +29,7 @@ public class GradeREST {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @RolesAllowed({"admin", "supervisor"})
     public Response updateGrade(@PathParam("index") int index, @PathParam("ID") int gradeID, bartoszgorka.models.Grade rawGradeBody) throws NotFoundException {
-        bartoszgorka.models.Grade g = DB.updateGrade(index, gradeID, rawGradeBody);
+        bartoszgorka.models.Grade g = Server.getDatabase().updateGrade(index, gradeID, rawGradeBody);
         g.clearLinks();
         return Response.ok(g).build();
     }
@@ -38,7 +38,7 @@ public class GradeREST {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @RolesAllowed({"supervisor", "admin"})
     public Response removeGrade(@PathParam("index") int index, @PathParam("ID") int gradeID) throws NotFoundException {
-        DB.removeGrade(index, gradeID);
+        Server.getDatabase().removeGrade(index, gradeID);
         return Response.noContent().build();
     }
 }
