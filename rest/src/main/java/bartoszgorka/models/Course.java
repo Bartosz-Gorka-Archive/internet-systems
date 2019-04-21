@@ -1,6 +1,7 @@
 package bartoszgorka.models;
 
-import bartoszgorka.rest.Courses;
+import bartoszgorka.rest.CourseREST;
+import bartoszgorka.rest.CoursesREST;
 import org.glassfish.jersey.linking.Binding;
 import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
@@ -14,24 +15,24 @@ import java.util.List;
 
 @XmlRootElement
 public class Course {
-    private int ID;
-    private String supervisor;
-    private String name;
     @InjectLinks({
-        @InjectLink(
-            style = InjectLink.Style.ABSOLUTE,
-            resource = bartoszgorka.rest.Course.class,
-            bindings = {@Binding(name="ID", value="${instance.ID}")},
-            rel = "self"),
-        @InjectLink(
-            style = InjectLink.Style.ABSOLUTE,
-            resource = Courses.class,
-            rel = "parent")
+            @InjectLink(
+                    style = InjectLink.Style.ABSOLUTE,
+                    resource = CourseREST.class,
+                    bindings = {@Binding(name = "ID", value = "${instance.ID}")},
+                    rel = "self"),
+            @InjectLink(
+                    style = InjectLink.Style.ABSOLUTE,
+                    resource = CoursesREST.class,
+                    rel = "parent")
     })
-    @XmlElement(name="link")
+    @XmlElement(name = "link")
     @XmlElementWrapper(name = "links")
     @XmlJavaTypeAdapter(Link.JaxbAdapter.class)
     List<Link> links;
+    private int ID;
+    private String supervisor;
+    private String name;
 
     public int getID() {
         return ID;
@@ -57,7 +58,7 @@ public class Course {
         this.name = name;
     }
 
-    public void setLinks(List<Link> links) {
-        this.links = links;
+    public void clearLinks() {
+        this.links = null;
     }
 }

@@ -7,7 +7,6 @@ public class ExceptionMapper implements javax.ws.rs.ext.ExceptionMapper<Throwabl
 
     public Response toResponse(Throwable ex) {
         ex.printStackTrace();
-        System.out.println("BLAD");
 
         return Response.status(500)
                 .entity(ex.toString())

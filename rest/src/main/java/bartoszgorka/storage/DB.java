@@ -1,27 +1,26 @@
-package bartoszgorka.models;
+package bartoszgorka.storage;
+
+import bartoszgorka.models.Course;
+import bartoszgorka.models.Grade;
+import bartoszgorka.models.Student;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
-import javax.ws.rs.core.Link;
-import javax.ws.rs.core.UriBuilder;
-import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class DB {
-    private static DB instance = null;
+    private static DB instance = new DB();
     private static Set<Student> students;
     private static Set<Course> courses;
     private static int lastStudentIndex = 0;
     private static int lastCourseID = 0;
-    private static URI uri;
 
-    // TODO required in this form?
+    private DB() {
+        loadData();
+    }
+
     public synchronized static DB getInstance() {
-        if (instance == null) {
-            instance = new DB();
-        }
-
         return instance;
     }
 
@@ -53,19 +52,13 @@ public class DB {
         student.setGrades(grades);
         students.add(student);
         lastStudentIndex++;
-
-        setCourseLinks(c);
-        setGradeLinks(grade);
-        setStudentLinks(student);
     }
 
     public static Set<Student> getStudents() {
-        DB.getInstance();
         return students;
     }
 
     public static Set<Course> getCourses() {
-        DB.getInstance();
         return courses;
     }
 
@@ -78,7 +71,6 @@ public class DB {
             student.setLastName(rawStudent.getLastName());
             student.setDateOfBirth(rawStudent.getDateOfBirth());
             student.setGrades(new HashSet<>());
-            DB.getInstance();
             students.add(student);
             return student;
         }
@@ -93,9 +85,7 @@ public class DB {
             course.setID(lastCourseID);
             course.setSupervisor(rawCourse.getSupervisor());
             course.setName(rawCourse.getName());
-            setCourseLinks(course);
 
-            DB.getInstance();
             courses.add(course);
             return course;
         }
@@ -104,7 +94,6 @@ public class DB {
     }
 
     public static Course updateCourse(int courseID, Course rawCourseBody) throws NotFoundException {
-        DB.getInstance();
         Optional<Course> possibleCourse = courses.stream().filter(course -> course.getID() == courseID).findFirst();
         if (possibleCourse.isPresent()) {
             Course course = possibleCourse.get();
@@ -122,7 +111,6 @@ public class DB {
     }
 
     public static void removeCourse(int courseID) throws NotFoundException {
-        DB.getInstance();
         Course c = courses.stream().filter(course -> course.getID() == courseID).findFirst().orElse(null);
         if (c != null) {
             courses.remove(c);
@@ -140,7 +128,6 @@ public class DB {
     }
 
     public static Student updateStudent(int index, Student rawStudentBody) throws NotFoundException {
-        DB.getInstance();
         Optional<Student> possibleStudent = students.stream().filter(student -> student.getIndex() == index).findFirst();
         if (possibleStudent.isPresent()) {
             Student student = possibleStudent.get();
@@ -161,7 +148,6 @@ public class DB {
     }
 
     public static void removeStudent(int index) throws NotFoundException {
-        DB.getInstance();
         Student s = students.stream().filter(student -> student.getIndex() == index).findFirst().orElse(null);
         if (s != null) {
             students.remove(s);
@@ -171,7 +157,6 @@ public class DB {
     }
 
     public static Set<Grade> getGrades(int index) throws NotFoundException {
-        DB.getInstance();
         Set<Grade> grades = students.stream().filter(student -> student.getIndex() == index).findFirst().map(Student::getGrades).orElse(null);
         if (grades != null) {
             return grades;
@@ -183,7 +168,6 @@ public class DB {
     public static Grade registerNewGrade(int index, Grade rawGradeBody) throws NotFoundException, BadRequestException {
         List<Integer> courseIDs = courses.stream().map(Course::getID).collect(Collectors.toList());
         if (courseIDs.contains(rawGradeBody.getCourseID()) && rawGradeBody.getCreatedAt() != null && rawGradeBody.getGrade() != null) {
-            DB.getInstance();
             Student student = students.stream().filter(s -> s.getIndex() == index).findFirst().orElse(null);
             if (student != null) {
                 Grade grade = new Grade();
@@ -192,7 +176,6 @@ public class DB {
                 grade.setStudentIndex(student.getIndex());
                 grade.setCourseID(rawGradeBody.getCourseID());
                 grade.setID(student.getNextGradeID());
-                setGradeLinks(grade);
 
                 student.getGrades().add(grade);
                 return grade;
@@ -205,13 +188,11 @@ public class DB {
     }
 
     public static Grade updateGrade(int index, int gradeID, Grade rawGradeBody) throws NotFoundException {
-        DB.getInstance();
         Grade grade = getGrades(index).stream().filter(g -> g.getID() == gradeID).findFirst().orElse(null);
         if (grade != null) {
             List<Integer> courseIDs = courses.stream().map(Course::getID).collect(Collectors.toList());
             if (courseIDs.contains(rawGradeBody.getCourseID())) {
                 grade.setCourseID(rawGradeBody.getCourseID());
-                setGradeLinks(grade);
             }
 
             if (rawGradeBody.getGrade() != null) {
@@ -228,54 +209,12 @@ public class DB {
         throw new NotFoundException();
     }
 
-    private static void setGradeLinks(Grade grade) {
-        Link self = Link.fromUriBuilder(UriBuilder.fromUri(uri).path("students").path(String.valueOf(grade.getStudentIndex())).path("grades").path(String.valueOf(grade.getID()))).rel("self").build();
-        Link grades = Link.fromUriBuilder(UriBuilder.fromUri(uri).path("students").path(String.valueOf(grade.getStudentIndex())).path("grades")).rel("grades").build();
-        Link student = Link.fromUriBuilder(UriBuilder.fromUri(uri).path("students").path(String.valueOf(grade.getStudentIndex()))).rel("student").build();
-        Link course = Link.fromUriBuilder(UriBuilder.fromUri(uri).path("courses").path(String.valueOf(grade.getCourseID()))).rel("course").build();
-
-        ArrayList<Link> links = new ArrayList<>();
-        links.add(self);
-        links.add(grades);
-        links.add(student);
-        links.add(course);
-        grade.setLinks(links);
-    }
-
-    private static void setCourseLinks(Course course) {
-        Link self = Link.fromUriBuilder(UriBuilder.fromUri(uri).path("courses").path(String.valueOf(course.getID()))).rel("self").build();
-        Link courses = Link.fromUriBuilder(UriBuilder.fromUri(uri).path("courses")).rel("courses").build();
-
-        ArrayList<Link> links = new ArrayList<>();
-        links.add(self);
-        links.add(courses);
-        course.setLinks(links);
-    }
-
-    private static void setStudentLinks(Student student) {
-        Link self = Link.fromUriBuilder(UriBuilder.fromUri(uri).path("students").path(String.valueOf(student.getIndex()))).rel("self").build();
-        Link grades = Link.fromUriBuilder(UriBuilder.fromUri(uri).path("students").path(String.valueOf(student.getIndex())).path("grades")).rel("grades").build();
-        Link students = Link.fromUriBuilder(UriBuilder.fromUri(uri).path("students")).rel("students").build();
-
-        ArrayList<Link> links = new ArrayList<>();
-        links.add(self);
-        links.add(grades);
-        links.add(students);
-        student.setLinks(links);
-    }
-
     public static void removeGrade(int index, int gradeID) throws NotFoundException {
-        DB.getInstance();
         Grade grade = getGrades(index).stream().filter(g -> g.getID() == gradeID).findFirst().orElse(null);
         if (grade != null) {
             getGrades(index).remove(grade);
         } else {
             throw new NotFoundException();
         }
-    }
-
-    public static void setBaseUri(URI baseUri) {
-        uri = baseUri;
-        loadData();
     }
 }

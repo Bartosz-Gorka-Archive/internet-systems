@@ -1,7 +1,8 @@
 package bartoszgorka.models;
 
-import bartoszgorka.rest.Grades;
-import bartoszgorka.rest.Students;
+import bartoszgorka.rest.GradesREST;
+import bartoszgorka.rest.StudentREST;
+import bartoszgorka.rest.StudentsREST;
 import org.glassfish.jersey.linking.Binding;
 import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
@@ -12,27 +13,30 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @XmlRootElement
 public class Student {
     @InjectLinks({
-        @InjectLink(
-            style = InjectLink.Style.ABSOLUTE,
-            resource = bartoszgorka.rest.Student.class,
-            bindings = {@Binding(name="index", value="${instance.index}")},
-            rel = "self"),
-        @InjectLink(
-            style = InjectLink.Style.ABSOLUTE,
-            resource = Students.class,
-            rel = "parent"),
-        @InjectLink(
-            style = InjectLink.Style.ABSOLUTE,
-            resource = Grades.class,
-            bindings = {@Binding(name="index", value="${instance.index}")},
-            rel = "grades")
+            @InjectLink(
+                    style = InjectLink.Style.ABSOLUTE,
+                    resource = StudentREST.class,
+                    bindings = {@Binding(name = "index", value = "${instance.index}")},
+                    rel = "self"),
+            @InjectLink(
+                    style = InjectLink.Style.ABSOLUTE,
+                    resource = StudentsREST.class,
+                    rel = "parent"),
+            @InjectLink(
+                    style = InjectLink.Style.ABSOLUTE,
+                    resource = GradesREST.class,
+                    bindings = {@Binding(name = "index", value = "${instance.index}")},
+                    rel = "grades")
     })
-    @XmlElement(name="link")
+    @XmlElement(name = "link")
     @XmlElementWrapper(name = "links")
     @XmlJavaTypeAdapter(Link.JaxbAdapter.class)
     List<Link> links;
@@ -92,7 +96,7 @@ public class Student {
         this.grades = grades;
     }
 
-    public void setLinks(List<Link> links) {
-        this.links = links;
+    public void clearLinks() {
+        this.links = null;
     }
 }
