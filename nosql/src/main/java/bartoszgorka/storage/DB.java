@@ -6,31 +6,36 @@ import bartoszgorka.models.Student;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
-import java.util.Set;
+import java.util.List;
 
 public interface DB {
-    Set<Student> getStudents();
+    List<Student> getStudents();
 
-    Set<Course> getCourses();
+    List<Course> getCourses();
 
-    Set<Grade> getGrades(int index) throws NotFoundException;
+    List<Grade> getGrades(int index) throws NotFoundException;
 
-    Grade registerNewGrade(int index, Grade rawGradeBody) throws NotFoundException, BadRequestException;
+    Grade registerNewGrade(Student student, Course course, Grade body) throws NotFoundException, BadRequestException;
 
-    Grade updateGrade(int index, int gradeID, Grade rawGradeBody) throws NotFoundException;
+    Grade updateGrade(Student student, Grade grade, Grade body) throws NotFoundException;
 
-    void removeGrade(int index, int gradeID) throws NotFoundException;
+    void removeGrade(Student student, Grade grade) throws NotFoundException;
 
-    Student addNewStudent(Student rawStudent) throws BadRequestException;
+    Student addNewStudent(Student student) throws BadRequestException;
 
-    Course registerNewCourse(Course rawCourse) throws BadRequestException;
+    Course registerNewCourse(Course body) throws BadRequestException;
 
-    Course updateCourse(int courseID, Course rawCourseBody) throws NotFoundException;
+    Course updateCourse(Course course, Course body) throws NotFoundException;
 
-    void removeCourse(int courseID) throws NotFoundException;
+    void removeCourse(Course course) throws NotFoundException;
 
-    Student updateStudent(int index, Student rawStudentBody) throws NotFoundException;
+    Student updateStudent(Student student, Student body) throws NotFoundException;
 
-    void removeStudent(int index) throws NotFoundException;
+    void removeStudent(Student student) throws NotFoundException;
 
+    Course getCourseByID(int courseID) throws NotFoundException;
+
+    Student getStudentByID(int index) throws NotFoundException;
+
+    Grade getGradeByID(Student student, int gradeID) throws NotFoundException;
 }

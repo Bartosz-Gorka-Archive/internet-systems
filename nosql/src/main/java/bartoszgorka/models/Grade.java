@@ -19,10 +19,10 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.Date;
 import java.util.List;
 
-@Embedded
+@Entity
 @XmlRootElement
 @Indexes(
-        @Index(fields = {@Field("studentIndex"), @Field("ID")}, options = @IndexOptions(unique = true))
+        @Index(fields = @Field("ID"), options = @IndexOptions(unique = true))
 )
 public class Grade {
     @InjectLinks({
@@ -65,6 +65,17 @@ public class Grade {
     private Date createdAt;
     private GradeValue grade;
 
+    public Grade() {
+    }
+
+    public Grade(int ID, int studentIndex, int courseID, Date createdAt, GradeValue grade) {
+        this.ID = ID;
+        this.studentIndex = studentIndex;
+        this.courseID = courseID;
+        this.createdAt = createdAt;
+        this.grade = grade;
+    }
+
     public int getID() {
         return ID;
     }
@@ -104,10 +115,6 @@ public class Grade {
 
     public void setGrade(GradeValue grade) {
         this.grade = grade;
-    }
-
-    public void clearLinks() {
-        this.links = null;
     }
 
     public enum GradeValue {

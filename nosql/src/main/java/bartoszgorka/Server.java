@@ -2,7 +2,7 @@ package bartoszgorka;
 
 import bartoszgorka.rest.*;
 import bartoszgorka.storage.DB;
-import bartoszgorka.storage.StaticDB;
+import bartoszgorka.storage.MongoDB;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.linking.DeclarativeLinkingFeature;
@@ -22,14 +22,14 @@ public class Server {
                 GradesREST.class,
                 GradeREST.class,
                 AuthenticationFilter.class,
-                DeclarativeLinkingFeature.class,
-                ExceptionMapper.class
+                DeclarativeLinkingFeature.class
         );
+        // If you want show logs - add ExceptionMapper.class
 
         HttpServer server = GrizzlyHttpServerFactory.createHttpServer(baseUri, config);
     }
 
     public static DB getDatabase() {
-        return StaticDB.getInstance();
+        return MongoDB.getInstance();
     }
 }

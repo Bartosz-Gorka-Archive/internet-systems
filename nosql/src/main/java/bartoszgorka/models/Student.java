@@ -16,9 +16,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @XmlRootElement
@@ -54,16 +52,15 @@ public class Student {
     private String firstName;
     private String lastName;
     private Date dateOfBirth;
-    @XmlTransient
-    @Embedded
-    private Set<Grade> grades = new HashSet<>();
-    @XmlTransient
-    private int lastGradeID = 0;
 
-    @XmlTransient
-    public int getNextGradeID() {
-        this.lastGradeID++;
-        return this.lastGradeID;
+    public Student() {
+    }
+
+    public Student(int index, String firstName, String lastName, Date dateOfBirth) {
+        this.index = index;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.dateOfBirth = dateOfBirth;
     }
 
     public int getIndex() {
@@ -96,18 +93,5 @@ public class Student {
 
     public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
-    }
-
-    @XmlTransient
-    public Set<Grade> getGrades() {
-        return grades;
-    }
-
-    public void setGrades(Set<Grade> grades) {
-        this.grades = grades;
-    }
-
-    public void clearLinks() {
-        this.links = null;
     }
 }

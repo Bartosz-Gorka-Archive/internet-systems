@@ -45,6 +45,15 @@ public class Course {
     private String supervisor;
     private String name;
 
+    public Course() {
+    }
+
+    public Course(int ID, String name, String supervisor) {
+        this.ID = ID;
+        this.supervisor = supervisor;
+        this.name = name;
+    }
+
     public int getID() {
         return ID;
     }
@@ -67,9 +76,5 @@ public class Course {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void clearLinks() {
-        this.links = null;
     }
 }
