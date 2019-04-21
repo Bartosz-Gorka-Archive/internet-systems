@@ -1,8 +1,9 @@
 package bartoszgorka.models;
 
-import bartoszgorka.rest.Course;
-import bartoszgorka.rest.Grades;
-import bartoszgorka.rest.Student;
+import bartoszgorka.rest.CourseREST;
+import bartoszgorka.rest.GradeREST;
+import bartoszgorka.rest.GradesREST;
+import bartoszgorka.rest.StudentREST;
 import org.glassfish.jersey.linking.Binding;
 import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
@@ -19,32 +20,31 @@ import java.util.List;
 @XmlRootElement
 public class Grade {
     @InjectLinks({
-        @InjectLink(
-            style = InjectLink.Style.ABSOLUTE,
-            resource = Grades.class,
-            bindings = {
-                @Binding(name="index", value="${instance.studentIndex}"),
-                @Binding(name="ID", value="${instance.ID}")
-            },
-            rel = "self"),
-        @InjectLink(
-            style = InjectLink.Style.ABSOLUTE,
-            resource = Student.class,
-            bindings = {@Binding(name="index", value="${instance.studentIndex}")},
-            rel = "student"),
-        @InjectLink(
-            style = InjectLink.Style.ABSOLUTE,
-            resource = bartoszgorka.rest.Grade.class,
-            bindings = {@Binding(name="index", value="${instance.studentIndex}")},
-            rel = "parent"),
-        @InjectLink(
-            style = InjectLink.Style.ABSOLUTE,
-            resource = Course.class,
-            bindings = {@Binding(name="ID", value="${instance.courseID}")},
-            rel = "course")
-
+            @InjectLink(
+                    style = InjectLink.Style.ABSOLUTE,
+                    resource = GradeREST.class,
+                    bindings = {
+                            @Binding(name = "index", value = "${instance.studentIndex}"),
+                            @Binding(name = "ID", value = "${instance.ID}")
+                    },
+                    rel = "self"),
+            @InjectLink(
+                    style = InjectLink.Style.ABSOLUTE,
+                    resource = StudentREST.class,
+                    bindings = {@Binding(name = "index", value = "${instance.studentIndex}")},
+                    rel = "student"),
+            @InjectLink(
+                    style = InjectLink.Style.ABSOLUTE,
+                    resource = GradesREST.class,
+                    bindings = {@Binding(name = "index", value = "${instance.studentIndex}")},
+                    rel = "parent"),
+            @InjectLink(
+                    style = InjectLink.Style.ABSOLUTE,
+                    resource = CourseREST.class,
+                    bindings = {@Binding(name = "ID", value = "${instance.courseID}")},
+                    rel = "course")
     })
-    @XmlElement(name="link")
+    @XmlElement(name = "link")
     @XmlElementWrapper(name = "links")
     @XmlJavaTypeAdapter(Link.JaxbAdapter.class)
     List<Link> links;
@@ -96,8 +96,8 @@ public class Grade {
         this.grade = grade;
     }
 
-    public void setLinks(List<Link> links) {
-        this.links = links;
+    public void clearLinks() {
+        this.links = null;
     }
 
     public enum GradeValue {
