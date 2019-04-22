@@ -12,8 +12,8 @@ import java.util.List;
 public class CoursesREST {
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public List<Course> getAllCourses() {
-        return Server.getDatabase().getCourses();
+    public List<Course> getCourses(@QueryParam("name") String name, @QueryParam("supervisor") String supervisor) {
+        return Server.getDatabase().getCourses(name, supervisor);
     }
 
     @POST

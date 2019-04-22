@@ -7,6 +7,7 @@ import bartoszgorka.models.Student;
 import com.mongodb.MongoClient;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
+import org.mongodb.morphia.query.Query;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
@@ -14,7 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 public class MongoDB implements DB {
-    private static final boolean DEBUG_MODE = false;
+    private static final boolean DEBUG_MODE = true;
     private static MongoDB instance = new MongoDB();
     private final Datastore datastore;
 
@@ -41,16 +42,17 @@ public class MongoDB implements DB {
         }
 
         if (datastore.getCount(Course.class) == 0 && datastore.getCount(Student.class) == 0) {
-            datastore.save(new Course(1, "Internet Systems", "Supervisor Name"));
+            datastore.save(new Course(1, "InternetSystems", "SupervisorName"));
+            datastore.save(new Course(2, "New", "Super"));
 
             datastore.save(new Student(1, "Amazing", "Student", new Date()));
             datastore.save(new Student(2, "Bad", "Boy", new Date()));
 
             datastore.save(new Grade(1, 1, 1, new Date(), Grade.GradeValue.BARDZO_DOBRY));
-            datastore.save(new Grade(2, 1, 1, new Date(), Grade.GradeValue.DOSTATECZNY));
+            datastore.save(new Grade(2, 1, 2, new Date(), Grade.GradeValue.DOSTATECZNY));
             datastore.save(new Grade(3, 2, 1, new Date(), Grade.GradeValue.DOBRY));
 
-            datastore.save(new Sequence(2, 1, 3));
+            datastore.save(new Sequence(2, 2, 3));
         }
     }
 
@@ -70,13 +72,23 @@ public class MongoDB implements DB {
     }
 
     @Override
-    public List<Student> getStudents() {
-        return datastore.createQuery(Student.class).asList();
+    public List<Student> getStudents(String firstNameFilter, String lastNameFilter) {
+        Query<Student> query = datastore.createQuery(Student.class);
+        if (firstNameFilter != null && !firstNameFilter.isEmpty())
+            query.field("firstName").containsIgnoreCase(firstNameFilter);
+        if (lastNameFilter != null && !lastNameFilter.isEmpty())
+            query.field("lastName").containsIgnoreCase(lastNameFilter);
+        return query.asList();
     }
 
     @Override
-    public List<Course> getCourses() {
-        return datastore.createQuery(Course.class).asList();
+    public List<Course> getCourses(String name, String supervisor) {
+        Query<Course> query = datastore.createQuery(Course.class);
+        if (name != null && !name.isEmpty())
+            query.field("name").containsIgnoreCase(name);
+        if (supervisor != null && !supervisor.isEmpty())
+            query.field("supervisor").containsIgnoreCase(supervisor);
+        return query.asList();
     }
 
     @Override
@@ -154,9 +166,21 @@ public class MongoDB implements DB {
     }
 
     @Override
-    public List<Grade> getGrades(int index) throws NotFoundException {
+    public List<Grade> getGrades(int index, int courseId, Grade.GradeValue value, String order) throws NotFoundException {
         Student student = this.getStudentByID(index);
-        return datastore.find(Grade.class).field("studentIndex").equal(student.getIndex()).asList();
+        Query<Grade> query = datastore.find(Grade.class).field("studentIndex").equal(student.getIndex());
+        if (courseId > 0)
+            query.field("courseID").equal(courseId);
+        if (value != null) {
+            if (order != null && order.equals("eq")) {
+                query.field("grade").equal(value);
+            } else if (order != null && order.equals("gt")) {
+                query.field("grade").hasAnyOf(Grade.GradeValue.greaterThan(value));
+            } else if (order != null && order.equals("lt")) {
+                query.field("grade").hasAnyOf(Grade.GradeValue.lessThan(value));
+            }
+        }
+        return query.asList();
     }
 
     @Override

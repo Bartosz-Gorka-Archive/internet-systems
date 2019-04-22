@@ -9,11 +9,11 @@ import javax.ws.rs.NotFoundException;
 import java.util.List;
 
 public interface DB {
-    List<Student> getStudents();
+    List<Student> getStudents(String firstNameFilter, String lastNameFilter);
 
-    List<Course> getCourses();
+    List<Course> getCourses(String name, String supervisor);
 
-    List<Grade> getGrades(int index) throws NotFoundException;
+    List<Grade> getGrades(int index, int courseId, Grade.GradeValue value, String order) throws NotFoundException;
 
     Grade registerNewGrade(Student student, Course course, Grade body) throws NotFoundException, BadRequestException;
 

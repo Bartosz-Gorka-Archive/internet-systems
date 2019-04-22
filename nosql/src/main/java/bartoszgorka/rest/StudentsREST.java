@@ -14,8 +14,8 @@ public class StudentsREST {
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @PermitAll
-    public List<Student> getAllStudents() {
-        return Server.getDatabase().getStudents();
+    public List<Student> getAllStudents(@QueryParam("first_name") String firstName, @QueryParam("last_name") String lastName) {
+        return Server.getDatabase().getStudents(firstName, lastName);
     }
 
     @POST
