@@ -11,6 +11,7 @@ import org.mongodb.morphia.query.Query;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -45,8 +46,11 @@ public class MongoDB implements DB {
             datastore.save(new Course(1, "InternetSystems", "SupervisorName"));
             datastore.save(new Course(2, "New", "Super"));
 
-            datastore.save(new Student(1, "Amazing", "Student", new Date()));
-            datastore.save(new Student(2, "Bad", "Boy", new Date()));
+            try {
+                datastore.save(new Student(1, "Amazing", "Student", new SimpleDateFormat("yyyy-MM-dd").parse("2012-01-01")));
+                datastore.save(new Student(2, "Bad", "Boy", new SimpleDateFormat("yyyy-MM-dd").parse("2014-02-05")));
+            } catch (Exception ignored) {
+            }
 
             datastore.save(new Grade(1, 1, 1, new Date(), Grade.GradeValue.BARDZO_DOBRY));
             datastore.save(new Grade(2, 1, 2, new Date(), Grade.GradeValue.DOSTATECZNY));
@@ -72,12 +76,21 @@ public class MongoDB implements DB {
     }
 
     @Override
-    public List<Student> getStudents(String firstNameFilter, String lastNameFilter) {
+    public List<Student> getStudents(String firstNameFilter, String lastNameFilter, Date birthDate, String order) {
         Query<Student> query = datastore.createQuery(Student.class);
         if (firstNameFilter != null && !firstNameFilter.isEmpty())
             query.field("firstName").containsIgnoreCase(firstNameFilter);
         if (lastNameFilter != null && !lastNameFilter.isEmpty())
             query.field("lastName").containsIgnoreCase(lastNameFilter);
+        if (birthDate != null) {
+            if (order != null && order.equals("eq")) {
+                query.field("dateOfBirth").equal(birthDate);
+            } else if (order != null && order.equals("gt")) {
+                query.field("dateOfBirth").greaterThan(birthDate);
+            } else if (order != null && order.equals("lt")) {
+                query.field("dateOfBirth").lessThan(birthDate);
+            }
+        }
         return query.asList();
     }
 

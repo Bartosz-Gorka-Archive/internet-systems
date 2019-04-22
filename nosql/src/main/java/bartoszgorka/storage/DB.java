@@ -6,10 +6,11 @@ import bartoszgorka.models.Student;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
+import java.util.Date;
 import java.util.List;
 
 public interface DB {
-    List<Student> getStudents(String firstNameFilter, String lastNameFilter);
+    List<Student> getStudents(String firstNameFilter, String lastNameFilter, Date birthDate, String order);
 
     List<Course> getCourses(String name, String supervisor);
 
