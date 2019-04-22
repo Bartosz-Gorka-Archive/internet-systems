@@ -16,8 +16,12 @@ public class GradesREST {
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @PermitAll
-    public List<Grade> getAllGradesForStudent(@PathParam("index") int index) {
-        return Server.getDatabase().getGrades(index);
+    public List<Grade> getGradesForStudent(
+            @PathParam("index") int index,
+            @QueryParam("course_id") int courseId,
+            @QueryParam("grade") Grade.GradeValue value,
+            @QueryParam("order") String order) {
+        return Server.getDatabase().getGrades(index, courseId, value, order);
     }
 
     @POST
