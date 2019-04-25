@@ -43,18 +43,23 @@ public class MongoDB implements DB {
         }
 
         if (datastore.getCount(Course.class) == 0 && datastore.getCount(Student.class) == 0) {
-            datastore.save(new Course(1, "InternetSystems", "SupervisorName"));
-            datastore.save(new Course(2, "New", "Super"));
-
             try {
-                datastore.save(new Student(1, "Amazing", "Student", new SimpleDateFormat("yyyy-MM-dd").parse("2012-01-01")));
-                datastore.save(new Student(2, "Bad", "Boy", new SimpleDateFormat("yyyy-MM-dd").parse("2014-02-05")));
+                Course firstCourse = new Course(1, "InternetSystems", "SupervisorName");
+                datastore.save(firstCourse);
+                Course secondCourse = new Course(2, "New", "Super");
+                datastore.save(secondCourse);
+
+                Student student = new Student(1, "Amazing", "Student", new SimpleDateFormat("yyyy-MM-dd").parse("2012-01-01"));
+                datastore.save(student);
+
+                datastore.save(new Grade(1, 1, 1, new Date(), Grade.GradeValue.BARDZO_DOBRY, student, firstCourse));
+                datastore.save(new Grade(2, 1, 2, new Date(), Grade.GradeValue.DOSTATECZNY, student, secondCourse));
+
+                student = new Student(2, "Bad", "Boy", new SimpleDateFormat("yyyy-MM-dd").parse("2014-02-05"));
+                datastore.save(student);
+                datastore.save(new Grade(3, 2, 1, new Date(), Grade.GradeValue.DOBRY, student, firstCourse));
             } catch (Exception ignored) {
             }
-
-            datastore.save(new Grade(1, 1, 1, new Date(), Grade.GradeValue.BARDZO_DOBRY));
-            datastore.save(new Grade(2, 1, 2, new Date(), Grade.GradeValue.DOSTATECZNY));
-            datastore.save(new Grade(3, 2, 1, new Date(), Grade.GradeValue.DOBRY));
 
             datastore.save(new Sequence(2, 2, 3));
         }
@@ -200,7 +205,7 @@ public class MongoDB implements DB {
     public Grade registerNewGrade(Student student, Course course, Grade body) throws NotFoundException, BadRequestException {
         if (body.getCreatedAt() != null && body.getGrade() != null) {
             int id = this.nextGradeIndex();
-            Grade grade = new Grade(id, student.getIndex(), course.getID(), body.getCreatedAt(), body.getGrade());
+            Grade grade = new Grade(id, student.getIndex(), course.getID(), body.getCreatedAt(), body.getGrade(), student, course);
             datastore.save(grade);
             return this.getGradeByID(student, id);
         }

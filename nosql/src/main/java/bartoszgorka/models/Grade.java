@@ -60,6 +60,12 @@ public class Grade {
     @XmlTransient
     @Id
     ObjectId _id;
+    @XmlTransient
+    @Reference
+    Course course;
+    @XmlTransient
+    @Reference
+    Student student;
     private int ID;
     @XmlTransient
     private int studentIndex;
@@ -71,12 +77,14 @@ public class Grade {
     public Grade() {
     }
 
-    public Grade(int ID, int studentIndex, int courseID, Date createdAt, GradeValue grade) {
+    public Grade(int ID, int studentIndex, int courseID, Date createdAt, GradeValue grade, Student student, Course course) {
         this.ID = ID;
         this.studentIndex = studentIndex;
         this.courseID = courseID;
         this.createdAt = createdAt;
         this.grade = grade;
+        this.student = student;
+        this.course = course;
     }
 
     public int getID() {
