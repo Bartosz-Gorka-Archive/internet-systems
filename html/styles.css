@@ -1,0 +1,167 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
+
+article {
+  display: none;
+  overflow-x: scroll;
+  padding: 10px 15px;
+}
+article:target {
+  display: block;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+body {
+  margin: 0;
+  color: #000000;
+  font-family: 'Montserrat', sans-serif;
+}
+
+header {
+  padding: 0 10px;
+  background-color: #ffd0c7;
+}
+
+header div {
+  display: inline-block;
+}
+
+header img {
+  width: 50px;
+  vertical-align: middle;
+  padding-bottom: 15px;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 100px;
+}
+
+.nav-content {
+  flex: 1 1 15%;
+}
+
+nav li {
+  display: block;
+  width: 100%;
+  padding: 10px 5px;
+}
+
+/* TODO only when links should be as 100% width */
+/* nav li a {
+  display: block;
+} */
+
+.content {
+  flex: 3 3 80%;
+}
+
+table input {
+  background-color: transparent;
+  border: none;
+  font-family: inherit;
+  width: 100%;
+  font-size: 1em;
+  display: block;
+  margin: 0;
+  height: inherit;
+  padding: 0 5px;
+  box-sizing: border-box;
+}
+
+input:invalid  {
+  border: 1px solid #d24949;
+}
+
+input[type="search"] {
+  background-image: url('http://i47.tinypic.com/r02vbq.png');
+  background-repeat: no-repeat;
+  background-position: 110% center;
+  padding-right: 30px;
+  box-sizing: border-box;
+}
+
+table input:focus {
+  outline: none;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #cccccc;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #efefef;
+}
+
+thead tr {
+  background-color: #999999;
+}
+
+tbody tr:hover, tbody tr:hover td {
+  background-color: #fff0c7;
+}
+
+td {
+  height: 40px; /* TODO only when supervisor require it */
+}
+
+select {
+  width: 100%;
+  display: block;
+  padding: 1em 1.5em 1em 1em;
+  border: none;
+  font-family: inherit;
+  background: transparent;
+}
+
+button {
+  background-color: #ffffff;
+  border: none;
+  color: black;
+  padding: 0.7em 0.8em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  cursor: pointer;
+  border-radius: 1em;
+}
+
+button:focus {
+  outline: none;
+}
+button:hover {
+  opacity: 0.7;
+}
+
+button.danger {
+  background-color: #f99a9a;
+}
+
+button.success {
+  background-color: #0cf976;
+}
+
+footer {
+  color: #000000;
+  background: linear-gradient(#ababab, #e4e4e4);
+  padding: 15px;
+  margin-top: 25px;
+  border-top: 1px solid #000000;
+
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
