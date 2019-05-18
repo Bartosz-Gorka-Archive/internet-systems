@@ -9,7 +9,7 @@ header, footer, nav.nav-content, input[type="search"], thead select {
 
 table input, thead tr, table tbody tr, tbody tr:nth-child(even), tbody tr:nth-child(odd), thead tr, tbody tr:hover, tbody tr:hover td {
   background: none;
-  background-color: none;
+  background-color: transparent;
 }
 
 tbody tr:last-child, td:last-child, th:last-child {
