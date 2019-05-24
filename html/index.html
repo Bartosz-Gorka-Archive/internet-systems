@@ -6,6 +6,10 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="print.css" media="print">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="scripts/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="scripts/knockout-3.5.0.js"></script>
+    <script type="text/javascript" src="scripts/knockout.mapping-latest.js"></script>
+    <script type="text/javascript" src="scripts/main.js"></script>
   </head>
   <body>
     <header>
@@ -60,56 +64,40 @@
                 </tr>
               </thead>
               <tbody>
+                <!-- ko foreach: students -->
                 <tr>
                   <td>
-                    <input type="number" name="index" value="127220" placeholder="Index" readonly>
+                    <input data-bind="value: index" type="number" name="index" placeholder="Index" readonly>
                   </td>
                   <td>
-                    <input type="text" name="firstname" value="Jan" placeholder="First name" required>
+                    <input data-bind="value: firstName" type="text" name="firstname" placeholder="First name" required>
                   </td>
                   <td>
-                    <input type="text" name="lastname" value="Kowalski" placeholder="Last name" required>
+                    <input data-bind="value: lastName" type="text" name="lastname" placeholder="Last name" required>
                   </td>
                   <td>
-                    <input type="date" name="birthdate" value="1990-01-01" min="1920-01-01" max="2010-01-01" required>
+                    <input data-bind="value: dateOfBirth" type="date" name="birthdate" min="1920-01-01" required>
                   </td>
                   <td>
                     <a href="#grades">Check student's grades</a>
-                    <button type="button" class="danger">Delete student</button>
+                    <button type="button" class="danger" data-bind="click: $parent.removeStudent">Delete student</button>
                   </td>
                 </tr>
-                <tr>
-                  <td>
-                    <input type="number" value="130303" placeholder="Index" readonly>
-                  </td>
-                  <td>
-                    <input type="text" name="firstname" value="John" placeholder="First name" required>
-                  </td>
-                  <td>
-                    <input type="text" name="lastname" value="Nowak" placeholder="Last name" required>
-                  </td>
-                  <td>
-                    <input type="date" name="birthdate" value="1993-06-02" min="1920-01-01" max="2010-01-01" required>
-                  </td>
-                  <td>
-                    <a href="#grades">Check student's grades</a>
-                    <button type="button" class="danger">Delete student</button>
-                  </td>
-                </tr>
+                <!-- /ko -->
                 <tr>
                   <td>
                   </td>
                   <td>
-                    <input type="text" name="firstname" placeholder="First name" required>
+                    <input data-bind="value: newStudent.index" type="text" name="firstname" placeholder="First name" required>
                   </td>
                   <td>
-                    <input type="text" name="lastname" placeholder="Last name" required>
+                    <input data-bind="value: newStudent.lastName" type="text" name="lastname" placeholder="Last name" required>
                   </td>
                   <td>
-                    <input type="date" name="birthdate" min="1920-01-01" max="2010-01-01" required>
+                    <input data-bind="value: newStudent.dateOfBirth" type="date" name="birthdate" min="1920-01-01" max="2010-01-01" required>
                   </td>
                   <td>
-                    <button type="button" class="success">Add new student</button>
+                    <button type="submit" data-bind="click: save" class="success">Add new student</button>
                   </td>
                 </tr>
               </tbody>
