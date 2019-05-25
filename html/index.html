@@ -38,7 +38,7 @@
 
       <article class="content" id="students">
         <h2>Students list</h2>
-        <form id="students-form">
+        <form id="students-form" data-bind="submit: saveNewStudent">
           <table>
               <thead>
                 <tr>
@@ -88,7 +88,7 @@
                   <td>
                   </td>
                   <td>
-                    <input data-bind="value: newStudent.index" type="text" name="firstname" placeholder="First name" required>
+                    <input data-bind="value: newStudent.firstName" type="text" name="firstname" placeholder="First name" required>
                   </td>
                   <td>
                     <input data-bind="value: newStudent.lastName" type="text" name="lastname" placeholder="Last name" required>
@@ -97,7 +97,7 @@
                     <input data-bind="value: newStudent.dateOfBirth" type="date" name="birthdate" min="1920-01-01" max="2010-01-01" required>
                   </td>
                   <td>
-                    <button type="submit" data-bind="click: save" class="success">Add new student</button>
+                    <button type="submit" class="success">Add new student</button>
                   </td>
                 </tr>
               </tbody>
