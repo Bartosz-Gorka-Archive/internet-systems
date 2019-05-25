@@ -28,9 +28,6 @@
             <a class="navlink" href="#students">Students list</a>
           </li>
           <li>
-            <a class="navlink" href="#grades">Grades list</a>
-          </li>
-          <li>
             <a class="navlink" href="#courses">Courses list</a>
           </li>
         </ul>
@@ -79,7 +76,7 @@
                     <input data-bind="value: dateOfBirth" type="date" name="birthdate" min="1920-01-01" required>
                   </td>
                   <td>
-                    <a href="#grades">Check student's grades</a>
+                    <a href="#grades" data-bind="click: $parent.setGrades">Check student's grades</a>
                     <button type="button" class="danger" data-bind="click: $parent.removeStudent">Delete student</button>
                   </td>
                 </tr>
@@ -105,9 +102,9 @@
         </form>
       </article>
 
-      <article class="content" id="grades">
+      <article class="content" id="grades" data-bind="if: newGrade.student">
         <h2>Grades list</h2>
-        <form id="grades-form">
+        <form id="grades-form" data-bind="submit: saveNewGrade">
           <table>
               <thead>
                 <tr>
@@ -133,76 +130,66 @@
                 </tr>
               </thead>
               <tbody>
+                <!-- ko foreach: { data: grades, as: 'gradeObject' } -->
                 <tr>
                   <td>
-                    <select>
-                      <option value="1" selected>Internet Systems</option>
-                      <option value="2">Image recognition</option>
+                    <select data-bind="options: $parent.courses,
+                       optionsText: function(item) {
+                         return item.name;
+                       },
+                       optionsValue: function(item) {
+                         return item.id;
+                       },
+                       value: gradeObject.courseID">
+                     </select>
+                  </td>
+                  <td>
+                    <input data-bind="value: createdAt" type="date" name="createdAt" min="2010-01-01" max="2019-12-31" value="2019-03-01" required>
+                  </td>
+                  <td>
+                    <select data-bind="options: $parent.possibleGradeValue,
+                      optionsText: function(item) {
+                        return item.name;
+                      },
+                      optionsValue: function(item) {
+                        return item.value;
+                      },
+                      value: gradeObject.grade">
                     </select>
                   </td>
                   <td>
-                    <input type="date" name="createdAt" min="2010-01-01" max="2019-12-31" value="2019-03-01" required>
-                  </td>
-                  <td>
-                    <select>
-                      <option value="NIEDOSTATECZNY">2.0</option>
-                      <option value="DOSTATECZNY">3.0</option>
-                      <option value="DOSTATECZNY_PLUS">3.5</option>
-                      <option value="DOBRY" selected>4.0</option>
-                      <option value="DOBRY_PLUS">4.5</option>
-                      <option value="BARDZO_DOBRY">5.0</option>
-                    </select>
-                  </td>
-                  <td>
-                    <button type="button" class="danger">Delete grade</button>
+                    <button type="button" class="danger" data-bind="click: $parent.removeGrade">Delete grade</button>
                   </td>
                 </tr>
+                <!-- /ko -->
                 <tr>
                   <td>
-                    <select>
-                      <option value="1">Internet Systems</option>
-                      <option value="2" selected>Image recognition</option>
+                    <select data-bind="options: courses,
+                       optionsText: function(item) {
+                         return item.name;
+                       },
+                       optionsValue: function(item) {
+                         return item.id;
+                       },
+                       value: newGrade.courseID">
+                     </select>
+                  </td>
+                  <td>
+                    <input data-bind="value: newGrade.createdAt" type="date" name="createdAt" min="2010-01-01" max="2019-12-31" required>
+                  </td>
+                  <td>
+                    <select data-bind="options: possibleGradeValue,
+                      optionsText: function(item) {
+                        return item.name;
+                      },
+                      optionsValue: function(item) {
+                        return item.value;
+                      },
+                      value: newGrade.grade">
                     </select>
                   </td>
                   <td>
-                    <input type="date" name="createdAt" min="2010-01-01" max="2019-12-31" value="2019-03-02" required>
-                  </td>
-                  <td>
-                    <select>
-                      <option value="NIEDOSTATECZNY">2.0</option>
-                      <option value="DOSTATECZNY">3.0</option>
-                      <option value="DOSTATECZNY_PLUS">3.5</option>
-                      <option value="DOBRY">4.0</option>
-                      <option value="DOBRY_PLUS">4.5</option>
-                      <option value="BARDZO_DOBRY" selected>5.0</option>
-                    </select>
-                  </td>
-                  <td>
-                    <button type="button" class="danger">Delete grade</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <select>
-                      <option value="1">Internet Systems</option>
-                      <option value="2">Image recognition</option>
-                    </select>
-                  </td>
-                  <td>
-                    <input type="date" name="createdAt" min="2010-01-01" max="2019-12-31" required>
-                  </td>
-                  <td>
-                    <select>
-                      <option value="NIEDOSTATECZNY">2.0</option>
-                      <option value="DOSTATECZNY">3.0</option>
-                      <option value="DOSTATECZNY_PLUS">3.5</option>
-                      <option value="DOBRY">4.0</option>
-                      <option value="DOBRY_PLUS">4.5</option>
-                      <option value="BARDZO_DOBRY">5.0</option>
-                    </select>
-                  </td>
-                  <td>
-                    <button type="button" class="success">Add new grade</button>
+                    <button type="submit" class="success">Add new grade</button>
                   </td>
                 </tr>
               </tbody>
@@ -275,7 +262,6 @@
     </footer>
 
     <!-- TODO list
-    * return from REST application grade with course
     * supervisor can change courseID in grade -->
   </body>
 </html>

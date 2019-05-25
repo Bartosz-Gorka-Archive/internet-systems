@@ -5,6 +5,8 @@ import bartoszgorka.rest.GradeREST;
 import bartoszgorka.rest.GradesREST;
 import bartoszgorka.rest.StudentREST;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.bson.types.ObjectId;
 import org.glassfish.jersey.linking.Binding;
 import org.glassfish.jersey.linking.InjectLink;
@@ -26,6 +28,7 @@ import java.util.List;
 @Indexes(
         @Index(fields = @Field("ID"), options = @IndexOptions(unique = true))
 )
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Grade {
     @InjectLinks({
             @InjectLink(
@@ -60,10 +63,11 @@ public class Grade {
     @XmlTransient
     @Id
     ObjectId _id;
-    @XmlTransient
+    @XmlElement(name = "course")
     @Reference
     Course course;
     @XmlTransient
+    @JsonIgnore
     @Reference
     Student student;
     private int ID;
