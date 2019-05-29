@@ -25,7 +25,7 @@ public class Server {
                 DeclarativeLinkingFeature.class
         );
         // If you want show logs - add ExceptionMapper.class
-        config.register(CQRSHeaders.class);
+        config.register(CORSHeaders.class);
         config.register(ExceptionMapper.class);
 
         HttpServer server = GrizzlyHttpServerFactory.createHttpServer(baseUri, config);

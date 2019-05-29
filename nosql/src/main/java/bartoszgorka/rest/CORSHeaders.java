@@ -4,7 +4,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 
-public class CQRSHeaders implements ContainerResponseFilter {
+public class CORSHeaders implements ContainerResponseFilter {
     @Override
     public void filter(ContainerRequestContext containerRequestContext, ContainerResponseContext containerResponseContext) {
         containerResponseContext.getHeaders().add("Access-Control-Allow-Origin", "*");
