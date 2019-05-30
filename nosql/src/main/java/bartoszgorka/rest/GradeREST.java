@@ -27,6 +27,7 @@ public class GradeREST {
     @RolesAllowed({"admin", "supervisor"})
     public Response updateGrade(@PathParam("index") int index, @PathParam("ID") int gradeID, Grade body) throws NotFoundException {
         Student student = Server.getDatabase().getStudentByID(index);
+        Server.getDatabase().getCourseByID(body.getCourseID());
         Grade grade = Server.getDatabase().getGradeByID(student, gradeID);
         Grade updatedGrade = Server.getDatabase().updateGrade(student, grade, body);
         return Response.ok(updatedGrade).build();

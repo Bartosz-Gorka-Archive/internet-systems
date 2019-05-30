@@ -21,10 +21,9 @@ public class Server {
                 CourseREST.class,
                 GradesREST.class,
                 GradeREST.class,
-                AuthenticationFilter.class,
+                CORSHeaders.class,
                 DeclarativeLinkingFeature.class
         );
-        // If you want show logs - add ExceptionMapper.class
 
         HttpServer server = GrizzlyHttpServerFactory.createHttpServer(baseUri, config);
     }

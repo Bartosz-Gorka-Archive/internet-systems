@@ -6,6 +6,10 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="print.css" media="print">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="scripts/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="scripts/knockout-3.5.0.js"></script>
+    <script type="text/javascript" src="scripts/knockout.mapping-latest.js"></script>
+    <script type="text/javascript" src="scripts/main.js"></script>
   </head>
   <body>
     <header>
@@ -24,9 +28,6 @@
             <a class="navlink" href="#students">Students list</a>
           </li>
           <li>
-            <a class="navlink" href="#grades">Grades list</a>
-          </li>
-          <li>
             <a class="navlink" href="#courses">Courses list</a>
           </li>
         </ul>
@@ -34,7 +35,7 @@
 
       <article class="content" id="students">
         <h2>Students list</h2>
-        <form id="students-form">
+        <form id="students-form" data-bind="submit: saveNewStudent">
           <table>
               <thead>
                 <tr>
@@ -60,56 +61,40 @@
                 </tr>
               </thead>
               <tbody>
+                <!-- ko foreach: students -->
                 <tr>
                   <td>
-                    <input type="number" name="index" value="127220" placeholder="Index" readonly>
+                    <input data-bind="value: index" type="number" name="index" placeholder="Index" readonly>
                   </td>
                   <td>
-                    <input type="text" name="firstname" value="Jan" placeholder="First name" required>
+                    <input data-bind="value: firstName" type="text" name="firstname" placeholder="First name" required>
                   </td>
                   <td>
-                    <input type="text" name="lastname" value="Kowalski" placeholder="Last name" required>
+                    <input data-bind="value: lastName" type="text" name="lastname" placeholder="Last name" required>
                   </td>
                   <td>
-                    <input type="date" name="birthdate" value="1990-01-01" min="1920-01-01" max="2010-01-01" required>
+                    <input data-bind="value: dateOfBirth" type="date" name="birthdate" min="1920-01-01" max="2019-01-01" required>
                   </td>
                   <td>
-                    <a href="#grades">Check student's grades</a>
-                    <button type="button" class="danger">Delete student</button>
+                    <a href="#grades" data-bind="click: $parent.setGrades">Check student's grades</a>
+                    <button type="button" class="danger" data-bind="click: $parent.removeStudent">Delete student</button>
                   </td>
                 </tr>
-                <tr>
-                  <td>
-                    <input type="number" value="130303" placeholder="Index" readonly>
-                  </td>
-                  <td>
-                    <input type="text" name="firstname" value="John" placeholder="First name" required>
-                  </td>
-                  <td>
-                    <input type="text" name="lastname" value="Nowak" placeholder="Last name" required>
-                  </td>
-                  <td>
-                    <input type="date" name="birthdate" value="1993-06-02" min="1920-01-01" max="2010-01-01" required>
-                  </td>
-                  <td>
-                    <a href="#grades">Check student's grades</a>
-                    <button type="button" class="danger">Delete student</button>
-                  </td>
-                </tr>
+                <!-- /ko -->
                 <tr>
                   <td>
                   </td>
                   <td>
-                    <input type="text" name="firstname" placeholder="First name" required>
+                    <input data-bind="value: newStudent.firstName" type="text" name="firstname" placeholder="First name" required>
                   </td>
                   <td>
-                    <input type="text" name="lastname" placeholder="Last name" required>
+                    <input data-bind="value: newStudent.lastName" type="text" name="lastname" placeholder="Last name" required>
                   </td>
                   <td>
-                    <input type="date" name="birthdate" min="1920-01-01" max="2010-01-01" required>
+                    <input data-bind="value: newStudent.dateOfBirth" type="date" name="birthdate" min="1920-01-01" max="2019-01-01" required>
                   </td>
                   <td>
-                    <button type="button" class="success">Add new student</button>
+                    <button type="submit" class="success">Add new student</button>
                   </td>
                 </tr>
               </tbody>
@@ -117,9 +102,9 @@
         </form>
       </article>
 
-      <article class="content" id="grades">
+      <article class="content" id="grades" data-bind="if: newGrade.student">
         <h2>Grades list</h2>
-        <form id="grades-form">
+        <form id="grades-form" data-bind="submit: saveNewGrade">
           <table>
               <thead>
                 <tr>
@@ -145,76 +130,66 @@
                 </tr>
               </thead>
               <tbody>
+                <!-- ko foreach: { data: grades, as: 'gradeObject' } -->
                 <tr>
                   <td>
-                    <select>
-                      <option value="1" selected>Internet Systems</option>
-                      <option value="2">Image recognition</option>
+                    <select data-bind="options: $parent.courses,
+                       optionsText: function(item) {
+                         return item.name;
+                       },
+                       optionsValue: function(item) {
+                         return item.id;
+                       },
+                       value: gradeObject.courseID">
+                     </select>
+                  </td>
+                  <td>
+                    <input data-bind="value: createdAt" type="date" name="createdAt" min="2010-01-01" max="2019-12-31" value="2019-03-01" required>
+                  </td>
+                  <td>
+                    <select data-bind="options: $parent.possibleGradeValue,
+                      optionsText: function(item) {
+                        return item.name;
+                      },
+                      optionsValue: function(item) {
+                        return item.value;
+                      },
+                      value: gradeObject.grade">
                     </select>
                   </td>
                   <td>
-                    <input type="date" name="createdAt" min="2010-01-01" max="2019-12-31" value="2019-03-01" required>
-                  </td>
-                  <td>
-                    <select>
-                      <option value="NIEDOSTATECZNY">2.0</option>
-                      <option value="DOSTATECZNY">3.0</option>
-                      <option value="DOSTATECZNY_PLUS">3.5</option>
-                      <option value="DOBRY" selected>4.0</option>
-                      <option value="DOBRY_PLUS">4.5</option>
-                      <option value="BARDZO_DOBRY">5.0</option>
-                    </select>
-                  </td>
-                  <td>
-                    <button type="button" class="danger">Delete grade</button>
+                    <button type="button" class="danger" data-bind="click: $parent.removeGrade">Delete grade</button>
                   </td>
                 </tr>
+                <!-- /ko -->
                 <tr>
                   <td>
-                    <select>
-                      <option value="1">Internet Systems</option>
-                      <option value="2" selected>Image recognition</option>
+                    <select data-bind="options: courses,
+                       optionsText: function(item) {
+                         return item.name;
+                       },
+                       optionsValue: function(item) {
+                         return item.id;
+                       },
+                       value: newGrade.courseID">
+                     </select>
+                  </td>
+                  <td>
+                    <input data-bind="value: newGrade.createdAt" type="date" name="createdAt" min="2010-01-01" max="2019-12-31" required>
+                  </td>
+                  <td>
+                    <select data-bind="options: possibleGradeValue,
+                      optionsText: function(item) {
+                        return item.name;
+                      },
+                      optionsValue: function(item) {
+                        return item.value;
+                      },
+                      value: newGrade.grade">
                     </select>
                   </td>
                   <td>
-                    <input type="date" name="createdAt" min="2010-01-01" max="2019-12-31" value="2019-03-02" required>
-                  </td>
-                  <td>
-                    <select>
-                      <option value="NIEDOSTATECZNY">2.0</option>
-                      <option value="DOSTATECZNY">3.0</option>
-                      <option value="DOSTATECZNY_PLUS">3.5</option>
-                      <option value="DOBRY">4.0</option>
-                      <option value="DOBRY_PLUS">4.5</option>
-                      <option value="BARDZO_DOBRY" selected>5.0</option>
-                    </select>
-                  </td>
-                  <td>
-                    <button type="button" class="danger">Delete grade</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <select>
-                      <option value="1">Internet Systems</option>
-                      <option value="2">Image recognition</option>
-                    </select>
-                  </td>
-                  <td>
-                    <input type="date" name="createdAt" min="2010-01-01" max="2019-12-31" required>
-                  </td>
-                  <td>
-                    <select>
-                      <option value="NIEDOSTATECZNY">2.0</option>
-                      <option value="DOSTATECZNY">3.0</option>
-                      <option value="DOSTATECZNY_PLUS">3.5</option>
-                      <option value="DOBRY">4.0</option>
-                      <option value="DOBRY_PLUS">4.5</option>
-                      <option value="BARDZO_DOBRY">5.0</option>
-                    </select>
-                  </td>
-                  <td>
-                    <button type="button" class="success">Add new grade</button>
+                    <button type="submit" class="success">Add new grade</button>
                   </td>
                 </tr>
               </tbody>
@@ -224,7 +199,7 @@
 
       <article class="content" id="courses">
         <h2>Courses list</h2>
-        <form id="courses-form">
+        <form id="courses-form" data-bind="submit: saveNewCourse">
           <table>
               <thead>
                 <tr>
@@ -241,45 +216,33 @@
                 </tr>
               </thead>
               <tbody>
+                <!-- ko foreach: courses -->
                 <tr>
                   <td>
-                    <input type="number" name="ID" value="1" readonly>
+                    <input data-bind="value: id" type="number" name="id" value="1" readonly>
                   </td>
                   <td>
-                    <input type="text" name="name" value="Internet Systems" required>
+                    <input data-bind="value: name" type="text" name="name" value="Internet Systems" required>
                   </td>
                   <td>
-                    <input type="text" name="supervisor" value="Better Supervisor" required>
+                    <input data-bind="value: supervisor" type="text" name="supervisor" value="Better Supervisor" required>
                   </td>
                   <td>
-                    <button type="button" class="danger">Delete course</button>
+                    <button type="button" class="danger" data-bind="click: $parent.removeCourse">Delete course</button>
                   </td>
                 </tr>
-                <tr>
-                  <td>
-                    <input type="number" name="ID" value="2" readonly>
-                  </td>
-                  <td>
-                    <input type="text" name="name" value="Image recognition" required>
-                  </td>
-                  <td>
-                    <input type="text" name="supervisor" value="Second Supervisor" required>
-                  </td>
-                  <td>
-                    <button type="button" class="danger">Delete course</button>
-                  </td>
-                </tr>
+                <!-- /ko -->
                 <tr>
                   <td>
                   </td>
                   <td>
-                    <input type="text" name="name" placeholder="Course name" required>
+                    <input data-bind="value: newCourse.name" type="text" name="name" placeholder="Course name" required>
                   </td>
                   <td>
-                    <input type="text" name="supervisor" placeholder="Supervisor name" required>
+                    <input data-bind="value: newCourse.supervisor" type="text" name="supervisor" placeholder="Supervisor name" required>
                   </td>
                   <td>
-                    <button type="button" class="success">Add new course</button>
+                    <button type="submit" class="success">Add new course</button>
                   </td>
                 </tr>
               </tbody>
@@ -299,7 +262,6 @@
     </footer>
 
     <!-- TODO list
-    * return from REST application grade with course
     * supervisor can change courseID in grade -->
   </body>
 </html>
