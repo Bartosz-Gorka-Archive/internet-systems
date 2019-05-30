@@ -219,6 +219,7 @@ public class MongoDB implements DB {
             grade.setGrade(body.getGrade());
         if (body.getCreatedAt() != null)
             grade.setCreatedAt(body.getCreatedAt());
+        grade.setCourseID(body.getCourseID());
 
         datastore.save(grade);
         return this.getGradeByID(student, grade.getID());

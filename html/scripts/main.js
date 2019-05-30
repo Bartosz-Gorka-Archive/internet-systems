@@ -8,7 +8,9 @@ function loadStudents(model) {
     dataType : "json",
     contentType: "application/json"
   }).done(function(result) {
-    ko.mapping.fromJS(result, {}, model.students);
+    result.forEach(function (record) {
+      model.students.push(new ObservableObject(record));
+    });
     model.students.subscribe(removedObjectCallback, null, 'arrayChange');
   });
 }
@@ -20,7 +22,9 @@ function loadCourses(model) {
     dataType : "json",
     contentType: "application/json"
   }).done(function(result) {
-    ko.mapping.fromJS(result, {}, model.courses);
+    result.forEach(function (record) {
+      model.courses.push(new ObservableObject(record));
+    });
     model.courses.subscribe(removedObjectCallback, null, 'arrayChange');
   });
 }
@@ -31,8 +35,10 @@ function loadGrades(model, student) {
     type: 'GET',
     dataType : "json",
     contentType: "application/json"
-  }).done(function(data) {
-    ko.mapping.fromJS(data, {}, model.grades);
+  }).done(function(result) {
+    result.forEach(function (record) {
+      model.grades.push(new ObservableObject(record));
+    });
   });
 }
 
@@ -61,37 +67,27 @@ function resourceUrl(record, type = 'self') {
   return resourceUrl.href();
 }
 
+function ObservableObject(data) {
+  var self = this;
+  ko.mapping.fromJS(data, {}, self);
+
+  ko.computed(function() {
+    return ko.mapping.toJSON(self);
+  }).subscribe(function(res) {
+    var resource = ko.mapping.fromJSON(res);
+    $.ajax({
+      url: resourceUrl(resource),
+      type: 'PUT',
+      dataType : "json",
+      contentType: "application/json",
+      data: ko.mapping.toJSON(self)
+    }).done(function(data) {
+      console.log('Record updated');
+    });
+  });
+}
+
 $(document).ready(function(){
-  function Student(data) {
-    var self = this;
-    self.index = ko.observable(data.index);
-    self.firstName = ko.observable(data.firstName);
-    self.lastName = ko.observable(data.lastName);
-    self.dateOfBirth = ko.observable(data.dateOfBirth);
-    self.link = ko.observableArray();
-    ko.mapping.fromJS(data.link, {}, self.link);
-  }
-
-  function Course(data) {
-    var self = this;
-    self.id = ko.observable(data.id);
-    self.name = ko.observable(data.name);
-    self.supervisor = ko.observable(data.supervisor);
-    self.link = ko.observableArray();
-    ko.mapping.fromJS(data.link, {}, self.link);
-  }
-
-  function Grade(data) {
-    var self = this;
-    self.id = ko.observable(data.id);
-    self.courseID = ko.observable(data.courseID);
-    self.createdAt = ko.observable(data.createdAt);
-    self.studentIndex = ko.observable(data.studentIndex);
-    self.grade = ko.observable(data.grade);
-    self.link = ko.observableArray();
-    ko.mapping.fromJS(data.link, {}, self.link);
-  }
-
   var StateViewModel = function () {
     var self = this;
     self.students = ko.observableArray();
@@ -125,6 +121,7 @@ $(document).ready(function(){
       self.students.remove(student)
     };
     self.setGrades = function(student) {
+      self.grades.removeAll();
       loadGrades(self, student);
       self.newGrade.student(student);
       self.newGrade.studentIndex(student.index());
@@ -155,7 +152,7 @@ $(document).ready(function(){
         contentType: "application/json",
         data: ko.mapping.toJSON(self.newStudent)
       }).done(function(data) {
-        self.students.push(new Student(data));
+        self.students.push(new ObservableObject(data));
         self.newStudent.firstName('');
         self.newStudent.lastName('');
         self.newStudent.dateOfBirth('');
@@ -169,7 +166,7 @@ $(document).ready(function(){
         contentType: "application/json",
         data: ko.mapping.toJSON(self.newCourse)
       }).done(function(data) {
-        self.courses.push(new Course(data));
+        self.courses.push(new ObservableObject(data));
         self.newCourse.name('');
         self.newCourse.supervisor('');
       });
@@ -182,7 +179,7 @@ $(document).ready(function(){
         contentType: "application/json",
         data: ko.mapping.toJSON(self.newGrade)
       }).done(function(data) {
-        self.grades.push(new Grade(data));
+        self.grades.push(new ObservableObject(data));
         self.newGrade.createdAt('');
       });
     };

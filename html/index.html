@@ -73,7 +73,7 @@
                     <input data-bind="value: lastName" type="text" name="lastname" placeholder="Last name" required>
                   </td>
                   <td>
-                    <input data-bind="value: dateOfBirth" type="date" name="birthdate" min="1920-01-01" required>
+                    <input data-bind="value: dateOfBirth" type="date" name="birthdate" min="1920-01-01" max="2019-01-01" required>
                   </td>
                   <td>
                     <a href="#grades" data-bind="click: $parent.setGrades">Check student's grades</a>
@@ -91,7 +91,7 @@
                     <input data-bind="value: newStudent.lastName" type="text" name="lastname" placeholder="Last name" required>
                   </td>
                   <td>
-                    <input data-bind="value: newStudent.dateOfBirth" type="date" name="birthdate" min="1920-01-01" max="2010-01-01" required>
+                    <input data-bind="value: newStudent.dateOfBirth" type="date" name="birthdate" min="1920-01-01" max="2019-01-01" required>
                   </td>
                   <td>
                     <button type="submit" class="success">Add new student</button>
