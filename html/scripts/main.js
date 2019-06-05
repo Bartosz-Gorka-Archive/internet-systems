@@ -22,16 +22,19 @@ function loadStudents(model) {
 }
 
 function loadCourses(model) {
+  var jsonData = ko.toJS(model.courseFilters);
+
   $.ajax({
     url: SERVER_URL + '/courses',
     type: 'GET',
     dataType : "json",
+    data: jsonData,
     contentType: "application/json"
   }).done(function(result) {
     result.forEach(function (record) {
       model.courses.push(new ObservableObject(record));
     });
-    model.courses.subscribe(removedObjectCallback, null, 'arrayChange');
+    model.courseSubscription = model.courses.subscribe(removedObjectCallback, null, 'arrayChange');
   });
 }
 
@@ -118,6 +121,7 @@ $(document).ready(function(){
       dateOfBirth: ko.observable()
     };
     self.studentSubscription = null;
+    self.courseSubscription = null;
     self.newCourse = {
       name: ko.observable(),
       supervisor: ko.observable()
@@ -127,6 +131,10 @@ $(document).ready(function(){
       last_name: ko.observable(),
       birth_date: ko.observable(),
       order: ko.observable()
+    };
+    self.courseFilters = {
+      name: ko.observable(),
+      supervisor: ko.observable()
     };
     self.newGrade = {
       studentIndex: ko.observable(),
@@ -214,6 +222,21 @@ $(document).ready(function(){
 
         // Load new data
         loadStudents(self);
+      });
+    });
+
+    Object.keys(self.courseFilters).forEach(function (key) {
+      self.courseFilters[key].subscribe(function (val) {
+        // Disable auto delete from database
+        if (self.courseSubscription) {
+          self.courseSubscription.dispose();
+        }
+
+        // Clear list of courses
+        self.courses.removeAll();
+
+        // Load new courses
+        loadCourses(self);
       });
     });
   }
