@@ -39,23 +39,29 @@
           <table>
               <thead>
                 <tr>
-                  <th>Index</th>
+                  <th>
+                    Index
+                  </th>
                   <th>
                     First name
-                    <input type="search" name="firstname">
+                    <input data-bind="textInput: studentFilters.first_name" type="search" name="first_name">
                   </th>
                   <th>
                     Last name
-                    <input type="search" name="lastname">
+                    <input data-bind="textInput: studentFilters.last_name" type="search" name="last_name">
                   </th>
                   <th>
                     Birth date
-                    <input type="search" name="birthdate">
-                    <select>
-                      <option value="lt">Less than</option>
-                      <option value="eq">Equal</option>
-                      <option value="gt">Greater than</option>
-                    </select>
+                    <input data-bind="textInput: studentFilters.birth_date" type="date" name="birth_date">
+                    <select data-bind="options: searchOptions,
+                       optionsText: function(item) {
+                         return item.value;
+                       },
+                       optionsValue: function(item) {
+                         return item.name;
+                       },
+                       value: studentFilters.order">
+                     </select>
                   </th>
                   <th>Actions</th>
                 </tr>
