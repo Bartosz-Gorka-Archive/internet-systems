@@ -39,10 +39,13 @@ function loadCourses(model) {
 }
 
 function loadGrades(model, student) {
+  var jsonData = ko.toJS(model.gradeFilters);
+
   $.ajax({
     url: resourceUrl(student, 'grades'),
     type: 'GET',
     dataType : "json",
+    data: jsonData,
     contentType: "application/json"
   }).done(function(result) {
     result.forEach(function (record) {
@@ -136,6 +139,11 @@ $(document).ready(function(){
       name: ko.observable(),
       supervisor: ko.observable()
     };
+    self.gradeFilters = {
+      grade: ko.observable(),
+      order: ko.observable(),
+      course_id: ko.observable()
+    };
     self.newGrade = {
       studentIndex: ko.observable(),
       courseID: ko.observable(),
@@ -148,7 +156,6 @@ $(document).ready(function(){
     };
     self.setGrades = function(student) {
       self.grades.removeAll();
-      loadGrades(self, student);
       self.newGrade.student(student);
       self.newGrade.studentIndex(student.index());
 
@@ -237,6 +244,18 @@ $(document).ready(function(){
 
         // Load new courses
         loadCourses(self);
+      });
+    });
+
+    Object.keys(self.gradeFilters).forEach(function (key) {
+      self.gradeFilters[key].subscribe(function (val) {
+        if (self.newGrade.student()) {
+          // Clear list of grades
+          self.grades.removeAll();
+
+          // Load new grades
+          loadGrades(self, self.newGrade.student());
+        }
       });
     });
   }

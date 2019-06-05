@@ -114,23 +114,43 @@
           <table>
               <thead>
                 <tr>
-                  <th>Course</th>
-                  <th>Created at</th>
+                  <th>
+                    Course
+                    <select data-bind="options: courses,
+                      optionsText: function(item) {
+                        return item.name;
+                      },
+                      optionsValue: function(item) {
+                        return item.id;
+                      },
+                      optionsCaption: 'Select course ...',
+                      value: gradeFilters.course_id">
+                    </select>
+                  </th>
+                  <th>
+                    Created at
+                  </th>
                   <th>
                     Value
-                    <select>
-                      <option value="NIEDOSTATECZNY">2.0</option>
-                      <option value="DOSTATECZNY">3.0</option>
-                      <option value="DOSTATECZNY_PLUS">3.5</option>
-                      <option value="DOBRY" selected>4.0</option>
-                      <option value="DOBRY_PLUS">4.5</option>
-                      <option value="BARDZO_DOBRY">5.0</option>
+                    <select data-bind="options: possibleGradeValue,
+                      optionsText: function(item) {
+                        return item.name;
+                      },
+                      optionsValue: function(item) {
+                        return item.value;
+                      },
+                      optionsCaption: 'Select grade ...',
+                      value: gradeFilters.grade">
                     </select>
-                    <select>
-                      <option value="lt">Less than</option>
-                      <option value="eq">Equal</option>
-                      <option value="gt">Greater than</option>
-                    </select>
+                    <select data-bind="options: searchOptions,
+                       optionsText: function(item) {
+                         return item.value;
+                       },
+                       optionsValue: function(item) {
+                         return item.name;
+                       },
+                       value: gradeFilters.order">
+                     </select>
                   </th>
                   <th>Actions</th>
                 </tr>
