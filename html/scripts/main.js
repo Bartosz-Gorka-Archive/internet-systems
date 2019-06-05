@@ -2,38 +2,50 @@
 const SERVER_URL = 'http://localhost:8000'
 
 function loadStudents(model) {
+  var jsonData = ko.toJS(model.studentFilters);
+  if (jsonData.birth_date === "") {
+    delete jsonData.birth_date;
+  }
+
   $.ajax({
     url: SERVER_URL + '/students',
     type: 'GET',
     dataType : "json",
+    data: jsonData,
     contentType: "application/json"
   }).done(function(result) {
     result.forEach(function (record) {
       model.students.push(new ObservableObject(record));
     });
-    model.students.subscribe(removedObjectCallback, null, 'arrayChange');
+    model.studentSubscription = model.students.subscribe(removedObjectCallback, null, 'arrayChange');
   });
 }
 
 function loadCourses(model) {
+  var jsonData = ko.toJS(model.courseFilters);
+
   $.ajax({
     url: SERVER_URL + '/courses',
     type: 'GET',
     dataType : "json",
+    data: jsonData,
     contentType: "application/json"
   }).done(function(result) {
     result.forEach(function (record) {
       model.courses.push(new ObservableObject(record));
     });
-    model.courses.subscribe(removedObjectCallback, null, 'arrayChange');
+    model.courseSubscription = model.courses.subscribe(removedObjectCallback, null, 'arrayChange');
   });
 }
 
 function loadGrades(model, student) {
+  var jsonData = ko.toJS(model.gradeFilters);
+
   $.ajax({
     url: resourceUrl(student, 'grades'),
     type: 'GET',
     dataType : "json",
+    data: jsonData,
     contentType: "application/json"
   }).done(function(result) {
     result.forEach(function (record) {
@@ -101,14 +113,36 @@ $(document).ready(function(){
       {name: '4.5', value: 'DOBRY_PLUS'},
       {name: '5.0', value: 'BARDZO_DOBRY'}
     ]);
+    self.searchOptions = ko.observableArray([
+      {name: 'lt', value: 'Less than'},
+      {name: 'eq', value: 'Equal'},
+      {name: 'gt', value: 'Greater than'}
+    ]);
     self.newStudent = {
       firstName: ko.observable(),
       lastName: ko.observable(),
       dateOfBirth: ko.observable()
     };
+    self.studentSubscription = null;
+    self.courseSubscription = null;
     self.newCourse = {
       name: ko.observable(),
       supervisor: ko.observable()
+    };
+    self.studentFilters = {
+      first_name: ko.observable(),
+      last_name: ko.observable(),
+      birth_date: ko.observable(),
+      order: ko.observable()
+    };
+    self.courseFilters = {
+      name: ko.observable(),
+      supervisor: ko.observable()
+    };
+    self.gradeFilters = {
+      grade: ko.observable(),
+      order: ko.observable(),
+      course_id: ko.observable()
     };
     self.newGrade = {
       studentIndex: ko.observable(),
@@ -122,7 +156,6 @@ $(document).ready(function(){
     };
     self.setGrades = function(student) {
       self.grades.removeAll();
-      loadGrades(self, student);
       self.newGrade.student(student);
       self.newGrade.studentIndex(student.index());
 
@@ -183,10 +216,51 @@ $(document).ready(function(){
         self.newGrade.createdAt('');
       });
     };
+
+    Object.keys(self.studentFilters).forEach(function (key) {
+      self.studentFilters[key].subscribe(function (val) {
+        // Disable auto delete from database
+        if (self.studentSubscription) {
+          self.studentSubscription.dispose();
+        }
+
+        // Clear list of students
+        self.students.removeAll();
+
+        // Load new data
+        loadStudents(self);
+      });
+    });
+
+    Object.keys(self.courseFilters).forEach(function (key) {
+      self.courseFilters[key].subscribe(function (val) {
+        // Disable auto delete from database
+        if (self.courseSubscription) {
+          self.courseSubscription.dispose();
+        }
+
+        // Clear list of courses
+        self.courses.removeAll();
+
+        // Load new courses
+        loadCourses(self);
+      });
+    });
+
+    Object.keys(self.gradeFilters).forEach(function (key) {
+      self.gradeFilters[key].subscribe(function (val) {
+        if (self.newGrade.student()) {
+          // Clear list of grades
+          self.grades.removeAll();
+
+          // Load new grades
+          loadGrades(self, self.newGrade.student());
+        }
+      });
+    });
   }
   var model = new StateViewModel();
   ko.applyBindings(model);
 
-  loadStudents(model);
   loadCourses(model);
 });
