@@ -139,6 +139,7 @@ $(document).ready(function(){
       name: ko.observable(),
       supervisor: ko.observable()
     };
+    self.loaded = false;
     self.gradeFilters = {
       grade: ko.observable(),
       order: ko.observable(),
@@ -158,6 +159,8 @@ $(document).ready(function(){
       self.grades.removeAll();
       self.newGrade.student(student);
       self.newGrade.studentIndex(student.index());
+      loadGrades(self, student);
+      self.loaded = true;
 
       // https://knockoutjs.com/documentation/click-binding.html#note-3-allowing-the-default-click-action
       return true;
@@ -249,7 +252,7 @@ $(document).ready(function(){
 
     Object.keys(self.gradeFilters).forEach(function (key) {
       self.gradeFilters[key].subscribe(function (val) {
-        if (self.newGrade.student()) {
+        if (self.loaded && self.newGrade.student()) {
           // Clear list of grades
           self.grades.removeAll();
 
